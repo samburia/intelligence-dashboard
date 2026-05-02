@@ -1661,6 +1661,50 @@ const DATA = {
     }
   ],
 
+  familyMembers: [
+    {
+      id: "fm001",
+      name: "Karen Kessler Gordon",
+      relation: "Spouse",
+      emoji: "👩",
+      phone: "509-868-9598",
+      email: "karengordon@therapysecur.com",
+      address: "7513 E. Whistling Wind Way, Scottsdale, AZ 85255",
+      occupation: "Founder & Therapist — Flourish Counseling",
+      credentials: "MS, LICSW",
+      notes: []
+    },
+    {
+      id: "fm002",
+      name: "India Paige Gordon",
+      relation: "Daughter",
+      emoji: "👧",
+      dob: "March 16, 2009",
+      phone: "480-843-8689",
+      email: "indiagordon27@gmail.com",
+      address: "7513 E. Whistling Wind Way, Scottsdale, AZ 85255",
+      school: "Pinnacle High School (Senior)",
+      nextStep: "Dixie State University (DSU) — Fall 2027",
+      notes: ["Equestrian — horse is TA Olyvia, a Purebred Arabian"]
+    },
+    {
+      id: "fm003",
+      name: "Blu",
+      relation: "Pet — Australian Labradoodle",
+      emoji: "🐶",
+      dob: "May 20, 2023",
+      notes: []
+    },
+    {
+      id: "fm004",
+      name: "TA Olyvia",
+      relation: "Horse — Purebred Arabian",
+      emoji: "🐴",
+      dob: "April 16, 2010",
+      notes: ["India's equestrian horse"]
+    }
+  ],
+
   processedFiles: [
     "05-01 The Paradigm Shift in AI Automation_ From GUI-Based Integration to Generative Code-Based Agents-Summary.txt",
     "04-29 Plan_ AI Certification Study Timeline and Exam Strategy-Summary.txt",
@@ -2306,6 +2350,41 @@ function renderHomeFamily(container) {
             ${kpHTML || "<div style='font-size:13px;color:var(--text-tertiary)'>No key points extracted.</div>"}
           </div>`;
       }).join("");
+
+    } else if (tabName === "Family Members") {
+      if (countEl) countEl.textContent = `${DATA.familyMembers.length} members`;
+      const row = (label, value, isLink, linkHref) => value ? `
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px">
+          <span style="font-size:10.5px;color:var(--text-tertiary);min-width:78px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px">${label}</span>
+          ${isLink ? `<a href="${linkHref}" style="font-size:13.5px;color:var(--accent);text-decoration:none;line-height:1.45">${value}</a>` : `<span style="font-size:13.5px;color:var(--text-primary);line-height:1.45">${value}</span>`}
+        </div>` : "";
+      content.innerHTML = DATA.familyMembers.map(m => `
+        <div class="entity-card" style="margin-bottom:16px">
+          <div class="entity-header" style="cursor:default">
+            <div class="entity-icon-wrap" style="background:linear-gradient(135deg,#f0ebe0,#e8dfce);font-size:26px">${m.emoji}</div>
+            <div>
+              <div class="entity-name">${m.name}</div>
+              <div class="entity-status">${m.relation}</div>
+            </div>
+          </div>
+          <div class="entity-body">
+            ${row("Born", m.dob)}
+            ${row("Phone", m.phone, true, `tel:${(m.phone||"").replace(/\D/g,"")}`)}
+            ${row("Email", m.email, true, `mailto:${m.email}`)}
+            ${row("Address", m.address)}
+            ${row("Work", m.occupation)}
+            ${row("Credentials", m.credentials)}
+            ${row("School", m.school)}
+            ${row("Next step", m.nextStep)}
+            ${m.notes && m.notes.length ? `
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+                ${m.notes.map(n => `
+                  <div style="font-size:13.5px;color:var(--text-secondary);padding:4px 0 4px 16px;position:relative;line-height:1.5">
+                    <span style="position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block"></span>${n}
+                  </div>`).join("")}
+              </div>` : ""}
+          </div>
+        </div>`).join("");
 
     } else {
       if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}`;
