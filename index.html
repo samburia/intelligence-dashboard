@@ -1,0 +1,2362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam Gordon — Intelligence Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sidebar-width: 256px;
+    --sidebar-bg: #1b2e21;
+    --accent: #c8761a;
+    --accent-light: #fef2e4;
+    --bg: #f7f4ef;
+    --card-bg: #ffffff;
+    --text-primary: #1c1c1e;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --border: rgba(0,0,0,0.07);
+    --shadow-sm: 0 1px 5px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 18px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05);
+    --radius: 12px;
+    --radius-lg: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+  }
+  #sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-header {
+    padding: 30px 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .sg-monogram {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #c8761a, #e8a84a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.5px;
+    margin-bottom: 13px;
+    box-shadow: 0 2px 8px rgba(200,118,26,0.45);
+  }
+  .sidebar-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: -0.2px;
+  }
+  .sidebar-tagline {
+    font-size: 11px;
+    color: rgba(255,255,255,0.38);
+    margin-top: 3px;
+    letter-spacing: 0.1px;
+  }
+
+  .sidebar-nav { padding: 10px 8px; flex: 1; }
+
+  .nav-section {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    padding: 14px 10px 5px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.75);
+    font-size: 13.5px;
+    font-weight: 450;
+    margin-bottom: 1px;
+    transition: background 0.13s ease;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.07); }
+  .nav-item.active {
+    background: rgba(255,255,255,0.11);
+    color: white;
+    font-weight: 530;
+  }
+  .nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-label { flex: 1; }
+  .nav-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 9px;
+    min-width: 18px;
+    text-align: center;
+    display: none;
+  }
+  .nav-badge.visible { display: block; }
+
+  .sidebar-footer {
+    padding: 14px 18px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+    color: rgba(255,255,255,0.28);
+    line-height: 1.6;
+  }
+
+  /* ── MAIN ── */
+  #main {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+  }
+  #main::-webkit-scrollbar { width: 5px; }
+  #main::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+  /* ── HOME PAGE ── */
+  .home-page {
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .home-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transition: background-image 0.5s ease;
+  }
+  .home-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      170deg,
+      rgba(15,25,10,0.30) 0%,
+      rgba(10,18,8,0.08) 42%,
+      rgba(25,15,5,0.62) 100%
+    );
+  }
+  .home-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 56px 60px 52px;
+  }
+  .home-top { }
+  .home-greeting {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .home-name {
+    font-size: 54px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -2.5px;
+    line-height: 1.0;
+    margin-bottom: 12px;
+  }
+  .home-date {
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.72);
+    letter-spacing: -0.3px;
+  }
+  .home-stats {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: var(--radius);
+    padding: 15px 20px;
+    min-width: 130px;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .stat-pill:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+  }
+  .stat-num {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1.2px;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .stat-lbl {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1px;
+  }
+
+  /* ── HOME SEARCH ── */
+  .home-search-wrap { margin: 32px 0 28px; }
+  .home-search-field {
+    position: relative;
+    max-width: 540px;
+  }
+  .home-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  .home-search-input {
+    width: 100%;
+    padding: 13px 18px 13px 44px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    font-size: 15px;
+    color: white;
+    font-family: var(--font);
+    outline: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .home-search-input::placeholder { color: rgba(255,255,255,0.45); }
+  .home-search-input:focus {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.42);
+  }
+  .home-search-results {
+    margin-top: 10px;
+    max-height: 360px;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    gap: 7px;
+    max-width: 540px;
+  }
+  .home-search-results::-webkit-scrollbar { width: 4px; }
+  .home-search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }
+  .home-result-item {
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 11px 15px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .home-result-item:hover { background: rgba(255,255,255,0.21); }
+  .home-result-title { font-size: 13.5px; font-weight: 600; color: white; line-height: 1.35; }
+  .home-result-meta { font-size: 11.5px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+  .home-result-snippet { font-size: 12.5px; color: rgba(255,255,255,0.75); margin-top: 4px; line-height: 1.45; }
+  .home-no-results { color: rgba(255,255,255,0.5); font-size: 13.5px; padding: 6px 2px; }
+
+  /* ── CATEGORY PAGE ── */
+  .cat-page { padding: 44px 44px 64px; }
+
+  .page-header { margin-bottom: 28px; }
+  .page-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -1px;
+    margin-bottom: 5px;
+  }
+  .page-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .count-chip {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--text-primary);
+    outline: none;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s ease;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-tertiary); }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 24px;
+    background: rgba(0,0,0,0.05);
+    padding: 4px;
+    border-radius: 10px;
+    width: fit-content;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.13s ease;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    font-weight: 560;
+  }
+
+  /* ── ENTRY CARD ── */
+  .entry-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+  }
+  .entry-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+  .card-top {
+    padding: 18px 22px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+  }
+  .card-cat-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    line-height: 1.35;
+    margin-bottom: 5px;
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .card-date { font-size: 11.5px; color: var(--text-tertiary); }
+  .card-tag {
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  .card-chevron {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    transition: background 0.13s, transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .card-chevron:hover { background: #e5e5ea; }
+  .card-chevron.open { transform: rotate(180deg); }
+
+  .card-summary {
+    padding: 0 22px 14px 70px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .card-detail {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .card-detail.open { display: block; }
+
+  .detail-section {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-section:last-child { border-bottom: none; }
+  .detail-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .kp-list { list-style: none; }
+  .kp-list li {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    padding: 5px 0 5px 16px;
+    position: relative;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .kp-list li:last-child { border-bottom: none; }
+  .kp-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 13px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .file-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: background 0.13s;
+  }
+  .file-btn:hover { background: #cde4ff; }
+
+  .xref-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    background: #f0ebe0;
+    padding: 4px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+    transition: background 0.13s, color 0.13s;
+  }
+  .xref-chip:hover { background: var(--accent-light); color: var(--accent); }
+
+  /* ── ENTITY CARD (Business / Research) ── */
+  .entity-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .entity-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #f8f4ee, #f0ebe0);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .entity-icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .entity-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.4px;
+  }
+  .entity-status { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .entity-body { padding: 20px 24px 24px; }
+
+  /* ── GOAL CARD ── */
+  .goal-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    box-shadow: var(--shadow-sm);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .goal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+  .goal-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.55; }
+  .goal-ai-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 14px 0 8px;
+  }
+
+  /* ── ACTION ITEM ── */
+  .action-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 9px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.15s;
+  }
+  .action-row:hover { box-shadow: var(--shadow-md); }
+  .action-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .action-circle.done { background: var(--accent); }
+  .action-body { flex: 1; }
+  .action-text { font-size: 13.5px; color: var(--text-primary); line-height: 1.45; }
+  .action-ref { font-size: 11.5px; color: var(--accent); margin-top: 3px; }
+
+  /* ── CONTACT CARD ── */
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 18px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 9px;
+    transition: box-shadow 0.15s;
+  }
+  .contact-row:hover { box-shadow: var(--shadow-md); }
+  .contact-row.needs-fu { background: #fffdf2; border-color: #f5c842; }
+  .contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #1b2e21, #2d5c35);
+  }
+  .contact-avatar.fu { background: linear-gradient(135deg, #c8761a, #e8a84a); }
+  .contact-info { flex: 1; }
+  .contact-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .contact-source { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .fu-badge {
+    font-size: 10px;
+    font-weight: 600;
+    background: #ffc107;
+    color: #664d03;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+  }
+  .toggle-switch {
+    width: 36px;
+    height: 20px;
+    background: #d1d1d6;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    transition: background 0.18s ease;
+    flex-shrink: 0;
+  }
+  .toggle-switch.on { background: #ff3b30; }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .toggle-switch.on::after { transform: translateX(16px); }
+
+  /* ── DUPLICATE NOTICE ── */
+  .dup-banner {
+    background: #fffbea;
+    border: 1px solid #f5c842;
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #664d03;
+  }
+  .dup-banner-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SECTION DIVIDER ── */
+  .section-divider {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 24px 0 12px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+  }
+  .empty-icon { font-size: 46px; opacity: 0.35; margin-bottom: 16px; }
+  .empty-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 7px;
+  }
+  .empty-body {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* ── UTILS ── */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <div class="sg-monogram">SG</div>
+      <div class="sidebar-name">Sam Gordon</div>
+      <div class="sidebar-tagline">Personal Intelligence Hub</div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" data-page="home" onclick="navigate('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </div>
+
+      <div class="nav-section">Business</div>
+      <div class="nav-item" data-page="active-biz" onclick="navigate('active-biz')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Active Businesses</span>
+        <span class="nav-badge" id="badge-active-biz">0</span>
+      </div>
+      <div class="nav-item" data-page="new-ideas" onclick="navigate('new-ideas')">
+        <span class="nav-icon">💡</span>
+        <span class="nav-label">New Business Ideas</span>
+        <span class="nav-badge" id="badge-new-ideas">0</span>
+      </div>
+      <div class="nav-item" data-page="goals" onclick="navigate('goals')">
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">Goals</span>
+        <span class="nav-badge" id="badge-goals">0</span>
+      </div>
+      <div class="nav-item" data-page="action-items" onclick="navigate('action-items')">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Critical Action Items</span>
+        <span class="nav-badge" id="badge-action-items">0</span>
+      </div>
+
+      <div class="nav-section">Knowledge</div>
+      <div class="nav-item" data-page="research" onclick="navigate('research')">
+        <span class="nav-icon">🔬</span>
+        <span class="nav-label">Research Projects</span>
+        <span class="nav-badge" id="badge-research">0</span>
+      </div>
+      <div class="nav-item" data-page="ai-apps" onclick="navigate('ai-apps')">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">AI Applications</span>
+        <span class="nav-badge" id="badge-ai-apps">0</span>
+      </div>
+
+      <div class="nav-section">Personal</div>
+      <div class="nav-item" data-page="home-family" onclick="navigate('home-family')">
+        <span class="nav-icon">🏡</span>
+        <span class="nav-label">Home &amp; Family</span>
+        <span class="nav-badge" id="badge-home-family">0</span>
+      </div>
+      <div class="nav-item" data-page="contacts" onclick="navigate('contacts')">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Contacts</span>
+        <span class="nav-badge" id="badge-contacts">0</span>
+      </div>
+
+      <div class="nav-section">Other</div>
+      <div class="nav-item" data-page="misc" onclick="navigate('misc')">
+        <span class="nav-icon">📦</span>
+        <span class="nav-label">Miscellaneous</span>
+        <span class="nav-badge" id="badge-misc">0</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Intelligence Dashboard<br>
+      <span id="footer-updated" style="color:rgba(255,255,255,0.22)"></span>
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main"></main>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA STORE — updated by Claude as you add files
+// ═══════════════════════════════════════════════
+const DATA = {
+  meta: {
+    owner: "Sam Gordon",
+    lastUpdated: "2026-05-02",
+    version: "1.0"
+  },
+
+  entries: [
+    {
+      id: "e001",
+      title: "The Paradigm Shift in AI Automation: From GUI-Based Integration to Generative Code-Based Agents",
+      date: "2026-05-01",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: ["new-ideas"],
+      summary: "The market for AI automation is undergoing a fundamental paradigm shift — GUI-based tools like Zapier and Make are becoming obsolete. Value has migrated from connecting pre-existing apps to generating autonomous, code-based agents from a single natural language prompt. This creates a high-margin consulting opportunity where consultants can build bespoke AI agents on-demand and command premium, value-based pricing completely detached from minimal time and effort.",
+      keyPoints: [
+        "GUI-based integration tools (Zapier, Make, n8n) are now considered obsolete — the market has fundamentally shifted",
+        "The new model is generation, not connection: a single prompt builds a standalone executable agent",
+        "Consultant workflow: receive client request → craft prompt → generate agent → install for client",
+        "Clients perceive the result as 'magic' and willingly pay premium fees (e.g. $50k) for the outcome",
+        "Value is entirely based on delivered capability — time and effort are minimal and irrelevant to pricing",
+        "Example: an autonomous agent that monitors and intelligently replies to a client's inbox"
+      ],
+      businessIdea: {
+        title: "AI Agent Consulting Service",
+        description: "High-margin consulting business: build bespoke autonomous AI agents for clients at premium value-based pricing. Minimal time per engagement, exceptionally high perceived value."
+      },
+      files: {
+        summary: "05-01 The Paradigm Shift in AI Automation_ From GUI-Based Integration to Generative Code-Based Agents-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "automation", "Zapier", "agents", "consulting", "Claude Code"]
+    },
+    {
+      id: "e002",
+      title: "Two-Track Execution Plan: Family Law Automation + AI Education Portal",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "A strategic plan to launch two complementary businesses: Family Law Automation (uncontested divorce portal + guidebook + mediation) as the immediate cash wedge, and an AI Education video course platform built on shared portal infrastructure. All other ideas — Preparedness Tech, Real Estate Tools — are deferred behind explicit stage-gates until these two reach cash flow.",
+      keyPoints: [
+        "Family Law Automation is the highest-priority wedge: leverages existing legal expertise, is highly automatable, and creates durable IP (forms, workflows, mediation add-on)",
+        "AI Education shares the same content/portal infrastructure and can be monetized via course sales and YouTube simultaneously",
+        "A single gated portal handles courses, document automation, digital products, payments, and access control for both businesses",
+        "Preparedness Tech (Raspberry Pi prepper disk, evacuation plans) and Real Estate Tools are credible but deferred with explicit stage-gates",
+        "Kill criteria defined: Family Law MVP needs 5+ paid customers; AI Education needs list-building pre-sales before full production",
+        "Graphic t-shirt idea deprioritized — low synergy and low competitive moat"
+      ],
+      businessIdea: {
+        title: "Family Law Automation + AI Education Two-Track Business",
+        description: "Launch Family Law Automation (online uncontested divorce portal, guidebook, mediation) as the cash wedge, while building an AI Education video course platform on shared portal infrastructure. Both businesses share one portal stack, one content pipeline, and one payment/delivery system."
+      },
+      files: {
+        summary: "04-29 Two-Track Execution Plan_ Family Law Automation as Cash Wedge, AI Education as Portal Backbone-Summary.txt",
+        transcript: "04-29 Two-Track Execution Plan_ Family Law Automation as Cash Wedge, AI Education as Portal Backbone-Voice Note.txt",
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["business", "family law", "AI education", "automation", "portal", "strategy"]
+    },
+    {
+      id: "e003",
+      title: "AI Certification Study Plan and Exam Timeline",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "goals",
+      secondaryCategories: [],
+      summary: "A structured plan to prepare for a primary AI certification exam by September 1, 2026, with daily 1-hour study sessions, flexible exam booking strategy, and a roadmap for 4–5 additional AI-related certifications. The plan also covers maintaining law license throughout and adding certifications to marketing materials upon completion.",
+      keyPoints: [
+        "Target: take the main AI certification exam by September 1, 2026 (earlier dates identified as accelerated options)",
+        "Establish a consistent 1-hour daily study session (suggested: 10 PM) with extra study blocks added when possible",
+        "Book the exam as soon as readiness is achieved to leverage short-term memory retention",
+        "Maintain law license throughout the certification process",
+        "Identify and set internal deadlines for 4–5 smaller AI-related certifications to pursue alongside the primary exam",
+        "Apply CBS MLT methodology to structure the overall study plan and timeline"
+      ],
+      files: {
+        summary: "04-29 Plan_ AI Certification Study Timeline and Exam Strategy-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "certification", "study plan", "exam", "professional development"]
+    },
+    {
+      id: "e004",
+      title: "Using a Design.g System File for Consistent, On-Brand AI UI Output",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Vague prompts like 'make it clean and premium' cause AI to guess aesthetics, producing inconsistent output. The solution is a design.g file — a structured system document encoding colors, typography, spacing, buttons, and layout — that Claude, v0, and Cursor use to render consistent, on-brand UI by default. Design context becomes an operational asset, not an afterthought.",
+      keyPoints: [
+        "Vague prompts cause AI to guess aesthetics, leading to inconsistent output and rework cycles",
+        "A design.g file encodes the full design system (colors, type, spacing, components) as a single source of truth",
+        "AI tools fed design.g act as execution engines rather than style improvisers — output is reproducible and on-brand",
+        "Works across tools: Claude, v0, Cursor — the same file applies to all",
+        "Operational shift: move design language upstream into a file; reuse across prompts, repos, and prototypes",
+        "Validation path: run a 2-page pilot (landing page + signup form) to measure consistency and time savings"
+      ],
+      files: {
+        summary: "04-29 From Prompts to Systems_ Using a Design.g File to Make AI Render Consistent, On‑Brand UI-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "design system", "Claude", "UI", "v0", "Cursor", "design.g"]
+    },
+    {
+      id: "e005",
+      title: "Using Google Analytics to Track AI-Driven Traffic from ChatGPT",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A specific, repeatable workflow to identify which website pages are being cited by AI tools (particularly ChatGPT) using Google Analytics. Pages cited by AI validate content authority. The playbook: Traffic Acquisition → filter by chatgpt.com as Source/Medium → cross-reference with Pages and Screens report. Double down on topics and formats of AI-cited pages.",
+      keyPoints: [
+        "Navigate: Google Analytics → Reports → Acquisition → Traffic Acquisition",
+        "Change primary dimension to Source/Medium and filter for 'chatgpt.com'",
+        "Cross-reference: Engagement → Pages and Screens, filter where Session Source contains 'chatgpt'",
+        "Pages in the result are actively cited by ChatGPT — a strong signal of content authority and utility",
+        "Strategy: double down on topics and formats of AI-cited pages to amplify organic, authoritative traffic",
+        "AI citation is not just a traffic metric — it validates the content's leverage and quality"
+      ],
+      files: {
+        summary: "04-29 Using Google Analytics to Track and Leverage AI-Driven Traffic from ChatGPT-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "SEO", "Google Analytics", "ChatGPT", "traffic", "content strategy"]
+    },
+    {
+      id: "e006",
+      title: "Evaluating Claude Design: AI-Native Pipeline for Design-to-Code and Marketing Assets",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Claude Design is positioned as a free replacement for Canva and Figma workflows — users import or auto-generate a design system, then produce social/brand assets (LinkedIn carousels, pitch decks, Instagram stories) and export to Claude Code. The tool's claims are aggressive and unverified, so the recommended approach is a controlled 2-week pilot measuring brand fidelity, speed, and code quality before broader adoption.",
+      keyPoints: [
+        "Setup: claude.ai/new → import existing design system OR prompt Claude to auto-generate one",
+        "Output claims: LinkedIn carousels, pitch decks, Instagram stories, logos — all exported to Claude Code",
+        "Key risks: brand fidelity drift, IP/copyright exposure for generated logos, no collaboration or version control",
+        "'Claude Code' export quality depends on stack compatibility — may introduce tech debt",
+        "Pilot recommendation: time-box to 2 weeks, test 3 narrow marketing assets, measure consistency vs. mockups",
+        "Go/no-go based on brand pass rate, time savings, rework hours, and code acceptance rate"
+      ],
+      files: {
+        summary: "04-29 Evaluating Claude Design_ AI-Native Pipeline for Design-to-Code and Marketing Asset Generation (Pilot Plan and Risk Controls)-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "Claude Design", "design", "Canva", "Figma", "brand", "marketing assets"]
+    },
+    {
+      id: "e007",
+      title: "Stanford AI Index Report",
+      date: null,
+      dateAdded: "2026-05-02",
+      primaryCategory: "research",
+      secondaryCategories: [],
+      summary: "A voice note flagging the Stanford AI Index Report as a key research resource to review. The Stanford AI Index is an annual publication tracking AI capabilities, investment, policy trends, and societal impact — an authoritative reference for understanding the current state and trajectory of AI.",
+      keyPoints: [
+        "Flagged as a priority research resource to review",
+        "Stanford AI Index is an annual report tracking AI capabilities, investment, policy, and societal impact",
+        "Authoritative source for evidence-based claims about AI industry progress and benchmarks",
+        "Directly relevant to AI certification preparation, consulting work, and understanding the AI landscape"
+      ],
+      files: {
+        summary: "Research Stanford AI Index Report-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "research", "Stanford", "AI Index", "industry report"]
+    },
+    {
+      id: "e008",
+      title: "Claude Artifacts: Building Live Self-Updating Project Dashboards",
+      date: null,
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A quick voice idea: use Claude's live artifacts feature to build a persistent dashboard or project board that automatically pulls fresh data and updates itself each time it is opened — eliminating manual refresh workflows. This dashboard is itself an example of this concept applied.",
+      keyPoints: [
+        "Claude's live artifacts feature can host a persistent, self-contained dashboard",
+        "The artifact pulls new data and updates automatically on every open",
+        "Use case: project boards, status trackers, recurring reports — anything benefiting from real-time data",
+        "No external server or database required — the artifact handles data fetching internally",
+        "Build once, open repeatedly — the dashboard stays current without any manual updates"
+      ],
+      files: {
+        summary: "Claude Artifacts-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "Claude", "artifacts", "dashboard", "automation", "live data"]
+    },
+    {
+      id: "e009",
+      title: "iPhone Sleep App Data Export for AI-Powered Sleep Analysis",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "A brief voice note identifying the need to export sleep data from an iPhone sleep tracking app and run it through AI analysis for a clearer, personalized picture of sleep patterns and experiences during the night.",
+      keyPoints: [
+        "Goal: export sleep data from iPhone sleep tracking app",
+        "Feed exported data to AI for personalized sleep pattern analysis",
+        "Objective: get a more accurate picture of what is actually happening during sleep",
+        "Next step: identify the specific iPhone sleep app and research its available export options (CSV, Health app integration, etc.)"
+      ],
+      files: {
+        summary: null,
+        transcript: "2026-04-29 22_47_01-transcript.txt",
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Health & Wellness",
+      tags: ["health", "sleep", "iPhone", "data export", "AI analysis", "wellness"]
+    },
+    {
+      id: "e010",
+      title: "AI Business Opportunities: Tier Rankings and 5-Step Launch Blueprint",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: ["new-ideas"],
+      summary: "A lecture ranking AI business opportunities using a 3-criterion framework (profitability, competition, longevity). Top S-tier picks: AI Agent Development (#1), AI Consultant, AI Lead Generation, and Managed AI Cybersecurity. Accompanied by a 5-step launch blueprint: Validate → Pre-sell → Launch Manually → Build Audience → Productize.",
+      keyPoints: [
+        "S-tier: AI Agent Development (top), AI Consultant, AI Lead Generation, Managed AI Cybersecurity",
+        "A-tier: AI Voice Agents, AI Chat Agents, AI Venture Studio, AI-to-AI Marketplace",
+        "B-tier: AI Content Repurposing, AI Virtual Assistants, AI Logo/Brand Design, AI Copywriting",
+        "F-tier: Faceless AI YouTube Channels, AI Trading Bots (avoid entirely)",
+        "5-step launch: (1) Validate with landing page + waitlist, (2) Pre-sell via early adopter program, (3) Deliver manually first, (4) Build audience via influencer partnerships, (5) Productize after consistent revenue",
+        "Key principle: tie pricing to labor replacement or lead value — sell outcomes, not tools"
+      ],
+      businessIdea: {
+        title: "AI Agent Development Consultancy",
+        description: "Build custom AI agents for businesses — sales bots, document processors, virtual employees. S-tier opportunity with low competition and high profitability. Enter via consulting model, productize after proving consistent delivery."
+      },
+      files: {
+        summary: "04-30 Lecture_ AI Business Opportunities and Launch Blueprint-Summary.txt",
+        transcript: "04-30 Lecture_ AI Business Opportunities and Launch Blueprint-Meeting Highlights.txt",
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "business", "consulting", "agents", "launch", "strategy", "opportunities"]
+    },
+    {
+      id: "e011",
+      title: "GenSpark AI Agent: Autonomous Lead Generation and Business Workflow Execution",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "GenSpark demonstrated its 'CLOP' agentic feature by autonomously executing a full lead generation campaign for a hypothetical landscaping business: competitive analysis → gap identification (no local competitors using time-lapse video) → video creation → landing pages → 10 Facebook ads. The platform includes ~30 built-in skills and operates in a sandboxed environment.",
+      keyPoints: [
+        "GenSpark's CLOP feature combines strategy and action in one autonomous agent loop",
+        "Pilot: landscaping company lead gen — agent analyzed competitors, identified a gap, created videos + landing pages + 10 Facebook ads autonomously",
+        "~30 pre-loaded skills including web browsing, video creation, sending messages, and making calls",
+        "Native integrations with Microsoft Power Platform and Excel",
+        "Sandboxed environment provides extra security vs. less controlled AI agents",
+        "Entire workflow executed from a single high-level task prompt"
+      ],
+      files: {
+        summary: "04-30 GenSpark's AI Agent Demonstrates Autonomous Business Workflow Execution in a Lead Generation Use Case-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "GenSpark", "agents", "lead generation", "autonomous", "workflow"]
+    },
+    {
+      id: "e012",
+      title: "Mastering Advanced AI: Three-Step Pathway from Basic User to Elite Operator",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Most users remain stuck in basic AI applications like email drafting. A clear three-step pathway exists to elite operator status: (1) vendor-provided free training, (2) Claude's formal skills library (executable playbooks), and (3) the 'Awesome Claude Code Subagents' community repository — an app store for pre-built AI capabilities.",
+      keyPoints: [
+        "Step 1: Complete free vendor-provided training — learn directly from the source",
+        "Step 2: Use Claude's formal skills library — executable playbook documents directing AI to perform specific, repeatable tasks",
+        "Step 3: Engage with 'Awesome Claude Code Subagents' repository — community-curated pre-built integrations, like an app store for AI capabilities",
+        "The shift from conversational prompting to programmatic instruction (skills) is the key advancement",
+        "Elite operators delegate 'how' to AI while defining 'what' and 'why' themselves",
+        "Failing to adopt advanced AI applications results in being professionally left behind"
+      ],
+      files: {
+        summary: "04-30 Mastering Advanced AI_ A Three-Step Pathway from Basic User to Elite Operator-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "Claude", "skills", "advanced", "workflow", "learning", "elite operator"]
+    },
+    {
+      id: "e013",
+      title: "Fragmented AI Tool Stack Analysis: Moving Toward a Self-Sovereign Claude Ecosystem",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A personal AI tool stack assessment: Claude and Whisper are Tier 1 core engines (custom product-building and transcription). Gemini (YouTube/Docs search) and Perplexity (new computer feature only) are Tier 2 niche tools. ChatGPT is rated D-tier (slow, inconsistent). The strategic pivot is toward a self-sovereign, Claude-centered ecosystem for building AptX.",
+      keyPoints: [
+        "Tier 1 (Core): Claude ('top of the top' for building custom products), Whisper (A-tier for transcription/document creation)",
+        "Tier 2 (Niche): Gemini (A-tier solely for YouTube/Google Docs search integration), Perplexity (B-tier, only 'new computer feature' has value)",
+        "Tier 3 (Underperforming): ChatGPT (D-tier — slow, 'still not there'), NotebookLM (B-tier, 'still not there')",
+        "Strategic insight: closed, single-feature AI apps are being rejected in favor of foundational models with ultimate creative control",
+        "Building AptX as a new company centered on Claude as the primary execution engine",
+        "Self-sovereign ecosystem = build once, own the IP, extend without platform dependency"
+      ],
+      files: {
+        summary: "04-30 Analysis of a Fragmented AI Tool Stack and the Pivot to a Self-Sovereign Ecosystem-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "Claude", "ChatGPT", "Gemini", "Perplexity", "Whisper", "tool stack", "AptX"]
+    },
+    {
+      id: "e014",
+      title: "Free AI Learning Roadmap: CS229, CS224N, and CS230 Stanford Courses",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Three free Stanford courses form the backbone of a structured AI learning roadmap: CS229 (Machine Learning fundamentals by Andrew Ng), CS224N (NLP and transformers by Christopher Manning), and CS230 (Deep Learning in the real world by Andrew Ng). Together they take a learner from foundational theory to practical, deployable ML projects.",
+      keyPoints: [
+        "CS229 by Andrew Ng: 'the course that built the AI generation' — linear regression, neural networks, SVMs from scratch",
+        "CS224N by Christopher Manning: transformers, attention, BERT, LLMs from the ground up — a must-watch for understanding modern NLP",
+        "CS230 by Andrew Ng: bridges theory and practice — how to actually run ML projects in the real world",
+        "Courses are from 2018 editions — check for updated supplementary materials to stay current",
+        "All three are free and available as part of Stanford's open curriculum",
+        "Three courses, no excuses — a clear path from beginner to advanced AI practitioner"
+      ],
+      files: {
+        summary: "04-30 Lecture_ Free AI Learning Roadmap — CS229, CS224N, CS230 (Foundations, NLP, Deep Learning Practice)-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: ["c001", "c002"],
+      goalRefs: ["g001"],
+      tags: ["AI", "Stanford", "CS229", "CS224N", "CS230", "Andrew Ng", "deep learning", "NLP", "learning"]
+    },
+    {
+      id: "e015",
+      title: "Model Context Protocol (MCP): Standardizing How AI Models Connect to Tools",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "MCP (Model Context Protocol), open-sourced by Anthropic, replaces the old model of building separate integrations for each tool (Slack, GitHub, databases) with a single standardized protocol. An AI connects to an MCP server that exposes tools and resources; the integration is written once and works with any compatible model. Key differentiator: MCP is stateful — persistent connections throughout the session.",
+      keyPoints: [
+        "MCP eliminates per-tool custom integrations: write an integration once, use with any compatible AI model",
+        "AI connects to an MCP server that exposes resources and tools for read/write/execute operations",
+        "Stateful design: maintains a live, persistent connection throughout the AI session (vs. old stateless single-shot tool calls)",
+        "Built on REST principles, designed for long-running AI sessions",
+        "Open-sourced by Anthropic — compatible with Claude, GPT, and other open-source models",
+        "Real-world adoption: Replit, Sourcegraph, Cursor, and 50+ companies have shipped MCP servers"
+      ],
+      files: {
+        summary: "04-30 Lecture_ Model-facing Calling Protocol (MCP)-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "MCP", "Anthropic", "Claude", "integration", "protocol", "agentic"]
+    },
+    {
+      id: "e016",
+      title: "From Code Generation to Autonomous Software Creation: Agentic AI Case Study",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A pilot study built a fully functional app ('List It' — recipe ingredient extractor + grocery list builder) in 60 minutes using an LLM agent on an MCP server architecture. The critical insight: a true agent follows a Reason → Plan → Confirm → Execute loop, writing a design doc before any code. This shifts AI from code generator to autonomous engineering partner.",
+      keyPoints: [
+        "Built a complete app (frontend, backend, database, unit + integration tests) in 60 minutes from a single prompt",
+        "Standard LLM: generates code directly from prompt — powerful but non-strategic",
+        "Agent loop: Reason → Plan → Confirm → Execute — explores context, proposes options, writes design doc, self-reviews, THEN codes",
+        "The design doc and self-review phase is the core differentiator — AI as engineering partner, not just coder",
+        "Technical stack: precise prompt + LLM agent + GitHub repo via CLI + MCP server",
+        "The leverage comes from knowing when to use a simple LLM vs. a full agentic framework"
+      ],
+      files: {
+        summary: "04-30 From Code Generation to Autonomous Software Creation_ A Case Study in Agentic AI Development-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "agents", "MCP", "software development", "agentic", "code generation", "Claude Code"]
+    },
+    {
+      id: "e017",
+      title: "Master Prompt-Driven LinkedIn Content Calendar with Notion AI",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A 'master prompt' in Notion AI, combined with a profile/context database, auto-generates a full 4-week LinkedIn content calendar — 15–20 post ideas per week with hooks, timing, and briefs. This is claimed to be a 4× improvement over manual ideation (~5 ideas/week) and creates a content factory with predictable, high-volume output.",
+      keyPoints: [
+        "Single 'master prompt' in Notion AI + context database = auto-generated 4-week LinkedIn calendar",
+        "Output: 15–20 post ideas per week with hooks, posting times, and content briefs",
+        "Monthly throughput: 60–80 ideas vs. ~20 from manual brainstorming (claimed 4× improvement)",
+        "Workflow: paste master prompt → add context → generate → refine → publish",
+        "Context database contains profile info, themes, audience data — quality of input drives quality of output",
+        "Solves the 'blank calendar' problem for consistent posting cadence"
+      ],
+      files: {
+        summary: "04-30 Master Prompt-Driven LinkedIn Content Calendar_ Scaling Ideation with Notion AI and Context Database-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "LinkedIn", "content", "Notion AI", "marketing", "content calendar", "automation"]
+    },
+    {
+      id: "e018",
+      title: "Personal Plan: Obtain Canadian Citizenship by End of 2026",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "A personal plan to apply for Canadian citizenship by December 31, 2026, potentially qualifying through mother's Canadian citizenship status under new rules. Key uncertainty: verifying mother's current citizenship status without hiring an attorney. Research on the citizenship-by-descent process is the immediate first step.",
+      keyPoints: [
+        "Primary goal: apply for Canadian citizenship by end of 2026",
+        "Potential qualification path: citizenship through mother's Canadian citizenship under new eligibility rules",
+        "Critical uncertainty: mother's current citizenship status needs verification",
+        "Approach: find a way to verify status without the cost of hiring an attorney",
+        "Research Canadian citizenship-by-descent requirements and the full application process",
+        "Gather all required documentation and submit application before December 31, 2026"
+      ],
+      files: {
+        summary: "04-30 Personal Plan_ Canadian Citizenship-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["citizenship", "Canada", "personal", "family", "legal", "immigration"]
+    },
+    {
+      id: "e019",
+      title: "Outcome-First Prompt Architecture: Four-Part Framework for Targeted AI Execution",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Vague prompts produce generic AI output; structured four-part prompts drive targeted execution. The framework: (1) Outcome — define the end goal first, (2) Task — specify the immediate action, (3) Context — provide rich business documents, (4) Format — dictate exact output structure. When the operator owns 'why' and 'what,' the AI executes the 'how' precisely.",
+      keyPoints: [
+        "Outcome (End-State): define the ultimate goal first to drive backward planning (e.g., 'find 20 new customers/month')",
+        "Task (Immediate Action): specify the concrete action the model must perform right now (e.g., 'find 50 ideal leads')",
+        "Context (Operational Intelligence): attach documents defining the business, ICP, pricing, personas — 'more context, better answers'",
+        "Format (Delivery Spec): dictate output container and style (e.g., 'spreadsheet, plain English, grade-7 readability')",
+        "Backward planning: starting from the outcome forces the model to derive necessary steps, cutting exploration time",
+        "Operator asserts objective ownership — model becomes execution layer for the 'how'"
+      ],
+      files: {
+        summary: "04-30 Outcome-First Prompt Architecture_ Driving Targeted AI Execution Through Backward Planning and Constraints-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "prompting", "framework", "workflow", "productivity", "Claude", "prompt engineering"]
+    },
+    {
+      id: "e020",
+      title: "Turn AI Into an Interviewer to Architect Your Daily Workflows",
+      date: "2026-04-30",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "AI's highest-leverage capability is self-orchestration. The key move: tell AI to 'ask me questions' about your goals, routines, and constraints, then let it mine GitHub for relevant skills, propose tool integrations, and build an automated daily workflow. Human focus shifts from learning all the tools to clearly defining goals and letting AI interrogate you for the rest.",
+      keyPoints: [
+        "Key insight: AI's meta-ability (orchestrating itself) exceeds most users' ability to direct it manually",
+        "Method: describe your role and daily tasks, then explicitly instruct the model to ask clarifying questions",
+        "Agent captures constraints (data sources, schedules, security limits) and proposes an automation plan via Q&A",
+        "Model can source relevant skills and code from public repos (e.g., GitHub) aligned to user's tasks",
+        "Finance use case: automate pre-market data retrieval, portfolio checks, scheduled communications",
+        "Governance required: human oversight for tool permissions, data privacy, and production deployment"
+      ],
+      files: {
+        summary: "04-30 Turn AI Into an Interviewer to Architect Your Daily Workflows-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "workflow", "automation", "prompting", "Claude", "productivity", "agents"]
+    },
+    {
+      id: "e021",
+      title: "Security Review of AI Applications: Protecting Attorney-Client Privileged Information",
+      date: "2026-05-01",
+      dateAdded: "2026-05-02",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "A review is needed to assess the security and privacy levels of AI applications used in legal practice, with focus on attorney-client privileged information. Priority target: Lexis Plus with Prodigy. The review should compare privacy levels consistently across all AI tools currently in use, using printed materials brought home from the office.",
+      keyPoints: [
+        "Security and privacy review needed for all AI applications used in legal practice",
+        "Primary focus: how attorney-client privileged information is handled by each tool",
+        "Priority review target: Lexis Plus with Prodigy",
+        "Review should compare privacy levels of Lexis Plus against all other AI applications in use",
+        "Printed review materials have been brought home from the office",
+        "Key question: does the same level of privacy protection apply consistently across all AI tools?"
+      ],
+      files: {
+        summary: "05-01 Meeting_ Security Review of AI Applications-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "security", "privacy", "legal", "Lexis Plus", "attorney-client privilege", "LegalTech"]
+    },
+    {
+      id: "e022",
+      title: "AI + 3D Printing: From Slogan to a High-Pain Use Case",
+      date: "2026-05-01",
+      dateAdded: "2026-05-02",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "The concept of pairing AI with 3D printing is promising but currently undefined — a solution in search of a problem. Three candidate tracks with real value: (1) generative design for non-intuitive structures, (2) AI toolpath optimization for speed/yield, or (3) automated closed-loop QA for defect detection. The rule: pick one customer segment, validate pain, then build.",
+      keyPoints: [
+        "Current state: no defined user, bottleneck, or buyer — must find a specific high-pain use case first",
+        "Track 1: Generative design — lattices/topology-optimized parts that human designers cannot feasibly derive",
+        "Track 2: AI toolpath optimization — reduce print time, warping, and layer defects for specific printer/material combos",
+        "Track 3: Automated QA — vision/thermal monitoring with AI to detect defects mid-print and adapt parameters",
+        "Target segments: prototyping shops, medical device R&D, aerospace brackets",
+        "Decision rule: select one track + one segment, run 5 customer discovery interviews, validate pain before building"
+      ],
+      businessIdea: {
+        title: "AI-Driven 3D Printing Optimization",
+        description: "Apply AI to one of three high-pain manufacturing problems: generative design for complex geometries, toolpath optimization for speed/yield, or automated QA for defect detection. Validate with 5 customer discovery interviews in one segment before building anything."
+      },
+      files: {
+        summary: "05-01 From AI + 3D Printing Slogan to a Single High-Pain Use Case_ Generative Design, Toolpath Optimization, or Closed-Loop QA-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "3D printing", "manufacturing", "generative design", "automation", "business idea"]
+    },
+    {
+      id: "e023",
+      title: "Define MVP Before Platform Choice: Claude App Creator vs. Lovable for the Prepper Disc App",
+      date: "2026-04-29",
+      dateAdded: "2026-05-02",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "Before choosing between Claude App Creator and Lovable as the development platform for the prepper disc app, the MVP must be defined first. Without clear workflows, a data model, and offline/security requirements, platform selection is premature. The recommended path: draft the MVP spec, build a capability matrix, run 30-minute proofs on each platform, then decide.",
+      keyPoints: [
+        "Core principle: MVP First, Platform Second — platform choice must follow feature clarity, not precede it",
+        "Competing platforms: Claude App Creator (Anthropic internal tool, details still unknown) vs. Lovable (mature existing app builder)",
+        "Primary unknowns before building: core users, top 3 workflows, data model, offline/online needs, integrations, distribution method",
+        "Decision criteria: speed-to-prototype, capability fit (offline access, storage, search, security), operational ownership and vendor lock-in",
+        "Validation path: run 30-minute side-by-side proofs implementing the top workflow end-to-end on each platform",
+        "Connected to the Preparedness Tech track in the Two-Track Execution Plan — this is the next step for that deferred product"
+      ],
+      businessIdea: {
+        title: "Prepper Disc App",
+        description: "A companion app for the prepper disc (Raspberry Pi survival kit) covering offline content access, evacuation plans, maps, GPS coordinates, radio frequencies, and family coordination. Platform TBD after MVP-first validation between Claude App Creator and Lovable."
+      },
+      files: {
+        summary: "04-29 Define MVP before platform choice_ evaluating Claude App Creator vs. Lovable for the ‘prepper disc’ app-Summary.txt",
+        transcript: null,
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      tags: ["prepper", "app development", "MVP", "Claude App Creator", "Lovable", "Preparedness Tech", "business idea"]
+    },
+    {
+      id: "e024",
+      title: "Use AI to Generate an HOA Rules Summary for Homeowners",
+      date: "2026-05-01",
+      dateAdded: "2026-05-02",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "A voice note task: use AI to scan the full HOA rules document and generate a plain-language summary of do's and don'ts — useful both as a personal reference and as something to share with neighbors so everyone can easily track the details they must follow as homeowners.",
+      keyPoints: [
+        "Use AI to read and parse the full HOA rules document",
+        "Generate a clear, plain-language summary of do's and don'ts for homeowners",
+        "Share the summary with neighbors so everyone has an accessible reference",
+        "AI makes dense HOA documents digestible — high value, low effort task"
+      ],
+      files: {
+        summary: null,
+        transcript: "05-01 Planning_ AI-Driven HOA Rules Do’s and Don’ts Summary for Homeowners-transcript.txt",
+        recording: null
+      },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["HOA", "home", "AI", "legal", "neighbors", "rules summary"]
+    }
+  ],
+
+  activeBusinesses: [],
+
+  researchProjects: [
+    {
+      id: "rp001",
+      name: "Stanford AI Index Report",
+      status: "To Review",
+      description: "Annual Stanford report tracking AI capabilities, investment, policy trends, and societal impact. Flagged as a key resource for AI certification preparation and consulting work.",
+      entryRef: "e007"
+    }
+  ],
+
+  goals: [
+    {
+      id: "g001",
+      title: "Achieve AI Professional Certification by September 1, 2026",
+      description: "Complete primary AI certification exam by September 2026 with a daily 1-hour study routine. Follow with 4–5 additional AI certifications. Maintain law license throughout.",
+      deadline: "2026-09-01",
+      actionItems: [
+        { id: "ai001", text: "Establish a daily 1-hour study session targeting 10 PM nightly; add extra study blocks earlier in the day when available" },
+        { id: "ai002", text: "Research all available AI certification exam dates and book the exam as soon as readiness is confirmed" },
+        { id: "ai003", text: "Complete CS229 (Machine Learning), CS224N (NLP with Deep Learning), and CS230 (Deep Learning) as study foundation" },
+        { id: "ai004", text: "Identify 4–5 smaller AI-related certifications and set internal completion deadlines for each" },
+        { id: "ai005", text: "Add certification to LinkedIn, marketing materials, and resume immediately upon completion" }
+      ]
+    },
+  ],
+
+  contacts: [
+    {
+      id: "c001",
+      name: "Andrew Ng",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Free AI Learning Roadmap (CS229, CS230)",
+      notes: "Stanford AI professor; creator of CS229 (Machine Learning) and CS230 (Deep Learning) — free courses recommended as core study resources for AI certification"
+    },
+    {
+      id: "c002",
+      name: "Christopher Manning",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Free AI Learning Roadmap (CS224N)",
+      notes: "Stanford professor; creator of CS224N (NLP with Deep Learning) — covers transformers, attention, BERT, and LLMs from the ground up"
+    },
+    {
+      id: "c003",
+      name: "Jessica Bein",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Bein Performance Horses (beinperformancehorses.com)",
+      phone: "(480) 220-6710",
+      email: "jessica@beinperformancehorses.com",
+      address: "6807 E. Peak View Rd., Scottsdale, AZ 85266",
+      notes: "Co-founder of Bein Performance Horses (est. 1998). Head trainer and instructor. Specializes in reining, horsemanship, equitation, hunter pleasure, and showmanship. Multiple National Champion trainer. Website: beinperformancehorses.com"
+    },
+    {
+      id: "c004",
+      name: "David Bein",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Bein Performance Horses (beinperformancehorses.com)",
+      notes: "Co-founder of Bein Performance Horses alongside wife Jessica Bein. Founded 1998 in Arizona. Full-service horse training and riding lesson program."
+    },
+    {
+      id: "c005",
+      name: "Tim O'Neal",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Bein Performance Horses (beinperformancehorses.com)",
+      notes: "Trainer and Instructor at Bein Performance Horses."
+    }
+  ],
+
+  processedFiles: [
+    "05-01 The Paradigm Shift in AI Automation_ From GUI-Based Integration to Generative Code-Based Agents-Summary.txt",
+    "04-29 Plan_ AI Certification Study Timeline and Exam Strategy-Summary.txt",
+    "04-29 Two-Track Execution Plan_ Family Law Automation as Cash Wedge, AI Education as Portal Backbone-Summary.txt",
+    "04-29 Two-Track Execution Plan_ Family Law Automation as Cash Wedge, AI Education as Portal Backbone-Voice Note.txt",
+    "Research Stanford AI Index Report-Summary.txt",
+    "Claude Artifacts-Summary.txt",
+    "04-29 From Prompts to Systems_ Using a Design.g File to Make AI Render Consistent, On‑Brand UI-Summary.txt",
+    "04-29 Using Google Analytics to Track and Leverage AI-Driven Traffic from ChatGPT-Summary.txt",
+    "04-29 Evaluating Claude Design_ AI-Native Pipeline for Design-to-Code and Marketing Asset Generation (Pilot Plan and Risk Controls)-Summary.txt",
+    "2026-04-29 22_47_01-transcript.txt",
+    "04-30 Lecture_ AI Business Opportunities and Launch Blueprint-Summary.txt",
+    "04-30 Lecture_ AI Business Opportunities and Launch Blueprint-Meeting Highlights.txt",
+    "04-30 GenSpark's AI Agent Demonstrates Autonomous Business Workflow Execution in a Lead Generation Use Case-Summary.txt",
+    "04-30 Mastering Advanced AI_ A Three-Step Pathway from Basic User to Elite Operator-Summary.txt",
+    "04-30 Analysis of a Fragmented AI Tool Stack and the Pivot to a Self-Sovereign Ecosystem-Summary.txt",
+    "04-30 Lecture_ Free AI Learning Roadmap — CS229, CS224N, CS230 (Foundations, NLP, Deep Learning Practice)-Summary.txt",
+    "04-30 Lecture_ Model-facing Calling Protocol (MCP)-Summary.txt",
+    "04-30 From Code Generation to Autonomous Software Creation_ A Case Study in Agentic AI Development-Summary.txt",
+    "04-30 Master Prompt-Driven LinkedIn Content Calendar_ Scaling Ideation with Notion AI and Context Database-Summary.txt",
+    "04-30 Personal Plan_ Canadian Citizenship-Summary.txt",
+    "04-30 Outcome-First Prompt Architecture_ Driving Targeted AI Execution Through Backward Planning and Constraints-Summary.txt",
+    "04-30 Turn AI Into an Interviewer to Architect Your Daily Workflows-Summary.txt",
+    "05-01 Meeting_ Security Review of AI Applications-Summary.txt",
+    "05-01 From AI + 3D Printing Slogan to a Single High-Pain Use Case_ Generative Design, Toolpath Optimization, or Closed-Loop QA-Summary.txt",
+    "04-29 Define MVP before platform choice_ evaluating Claude App Creator vs. Lovable for the ‘prepper disc’ app-Summary.txt",
+    "05-01 Planning_ AI-Driven HOA Rules Do’s and Don’ts Summary for Homeowners-transcript.txt"
+  ],
+
+  duplicates: [
+    "05-01 The Paradigm Shift in AI Automation_ From GUI-Based Integration to Generative Code-Based Agents-Summary.txt"
+  ]
+};
+
+// ═══════════════════════════
+// HELPERS
+// ═══════════════════════════
+// One photo per day of the week (Sun–Sat) — nature, wildlife, landscapes
+const BACKGROUNDS = [
+  // Sunday: Golden meadow at sunrise
+  "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1920&q=85&auto=format&fit=crop",
+  // Monday: Fox in a snowy forest
+  "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=1920&q=85&auto=format&fit=crop",
+  // Tuesday: Misty mountain valley
+  "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=85&auto=format&fit=crop",
+  // Wednesday: Sunlit ancient forest
+  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=85&auto=format&fit=crop",
+  // Thursday: Bald eagle soaring
+  "https://images.unsplash.com/photo-1611689342806-0863de1ddc43?w=1920&q=85&auto=format&fit=crop",
+  // Friday: Ocean cliffs at golden hour
+  "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1920&q=85&auto=format&fit=crop",
+  // Saturday: Snow-capped peaks, warm alpenglow
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=85&auto=format&fit=crop"
+];
+
+const BG_FALLBACKS = [
+  "linear-gradient(160deg,#2a3d15,#4a6520)",  // Sunday  — meadow green
+  "linear-gradient(160deg,#1e2d35,#2a4050)",  // Monday  — winter blue-slate
+  "linear-gradient(160deg,#1a2e20,#223d28)",  // Tuesday — mountain forest
+  "linear-gradient(160deg,#1c3220,#2e5030)",  // Wednesday — deep forest
+  "linear-gradient(160deg,#1a2535,#253848)",  // Thursday — sky blue
+  "linear-gradient(160deg,#2a2010,#4a3818)",  // Friday  — golden hour
+  "linear-gradient(160deg,#1e2838,#2a3d52)"   // Saturday — twilight peaks
+];
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}
+
+function fmtDate(str) {
+  if (!str) return "";
+  const d = new Date(str + "T12:00:00");
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+function fmtToday() {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  });
+}
+
+function getEntriesFor(cat) {
+  return DATA.entries.filter(e =>
+    e.primaryCategory === cat || (e.secondaryCategories || []).includes(cat)
+  );
+}
+
+function getAllActionItems() {
+  const items = [];
+  DATA.goals.forEach(g => {
+    (g.actionItems || []).forEach(ai => items.push({ ...ai, goalTitle: g.title, goalId: g.id }));
+  });
+  return items;
+}
+
+// ═══════════════════════════
+// NAVIGATION
+// ═══════════════════════════
+let currentPage = "home";
+
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll(".nav-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.page === page);
+  });
+  const main = document.getElementById("main");
+  main.scrollTo(0, 0);
+  RENDERERS[page] ? RENDERERS[page](main) : renderEmpty(main, page);
+}
+
+// ═══════════════════════════
+// HOME
+// ═══════════════════════════
+function renderHome(container) {
+  const dayIdx = new Date().getDay();
+  const bg = BACKGROUNDS[dayIdx];
+  const fallback = BG_FALLBACKS[dayIdx];
+
+  const totalEntries = DATA.entries.length;
+  const activeBiz = DATA.activeBusinesses.length;
+  const newIdeas = getEntriesFor("new-ideas").length;
+  const goalCount = DATA.goals.length;
+  const actionCount = getAllActionItems().length;
+
+  container.innerHTML = `
+    <div class="home-page">
+      <div class="home-bg" id="home-bg" style="background: ${fallback};"></div>
+      <div class="home-content">
+        <div class="home-top">
+          <div class="home-greeting">${greeting()}</div>
+          <div class="home-name">Sam Gordon</div>
+          <div class="home-date">${fmtToday()}</div>
+        </div>
+        <div class="home-search-wrap">
+          <div class="home-search-field">
+            <span class="home-search-icon">🔍</span>
+            <input
+              class="home-search-input"
+              id="home-search"
+              type="text"
+              placeholder="Search recordings, ideas, goals…"
+              oninput="homeSearch(this.value)"
+              autocomplete="off"
+            />
+          </div>
+          <div class="home-search-results" id="home-search-results"></div>
+        </div>
+        <div class="home-stats" id="home-stats">
+          <div class="stat-pill" onclick="navigate('ai-apps')">
+            <div class="stat-num">${totalEntries}</div>
+            <div class="stat-lbl">Recordings</div>
+          </div>
+          <div class="stat-pill" onclick="navigate('active-biz')">
+            <div class="stat-num">${activeBiz}</div>
+            <div class="stat-lbl">Active Businesses</div>
+          </div>
+          <div class="stat-pill" onclick="navigate('new-ideas')">
+            <div class="stat-num">${newIdeas}</div>
+            <div class="stat-lbl">New Ideas</div>
+          </div>
+          <div class="stat-pill" onclick="navigate('goals')">
+            <div class="stat-num">${goalCount}</div>
+            <div class="stat-lbl">Goals</div>
+          </div>
+          <div class="stat-pill" onclick="navigate('action-items')">
+            <div class="stat-num">${actionCount}</div>
+            <div class="stat-lbl">Action Items</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Try to load the real photo; fall back to gradient if it fails
+  const img = new Image();
+  img.onload = () => {
+    const el = document.getElementById("home-bg");
+    if (el) el.style.backgroundImage = `url('${bg}')`;
+  };
+  img.src = bg;
+}
+
+// ═══════════════════════════
+// HOME SEARCH
+// ═══════════════════════════
+const CAT_LABELS = {
+  "ai-apps":     "AI Apps",
+  "new-ideas":   "New Ideas",
+  "research":    "Research",
+  "active-biz":  "Active Business",
+  "home-family": "Home & Family",
+  "goals":       "Goals",
+  "contacts":    "Contacts",
+  "misc":        "Misc"
+};
+
+function homeSearch(query) {
+  const q = query.trim().toLowerCase();
+  const resultsEl = document.getElementById("home-search-results");
+  const statsEl   = document.getElementById("home-stats");
+  if (!resultsEl) return;
+
+  if (!q) {
+    resultsEl.style.display = "none";
+    resultsEl.innerHTML = "";
+    if (statsEl) statsEl.style.display = "";
+    return;
+  }
+
+  if (statsEl) statsEl.style.display = "none";
+
+  const hits = DATA.entries.filter(e =>
+    e.title.toLowerCase().includes(q) ||
+    (e.summary || "").toLowerCase().includes(q) ||
+    (e.keyPoints || []).some(k => k.toLowerCase().includes(q)) ||
+    (e.tags || []).some(t => t.toLowerCase().includes(q))
+  );
+
+  resultsEl.style.display = "flex";
+
+  if (!hits.length) {
+    resultsEl.innerHTML = `<div class="home-no-results">No results for "${escHtml(query)}"</div>`;
+    return;
+  }
+
+  resultsEl.innerHTML = hits.slice(0, 10).map(e => {
+    const cat = CAT_LABELS[e.primaryCategory] || e.primaryCategory;
+    const snippet = e.summary ? e.summary.slice(0, 110) + "…" : "";
+    // Highlight matching text
+    function hl(str) {
+      if (!str) return "";
+      const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})`, "gi");
+      return escHtml(str).replace(re, `<mark style="background:rgba(255,212,0,0.35);color:inherit;border-radius:2px">$1</mark>`);
+    }
+    return `
+      <div class="home-result-item" onclick="navigate('${e.primaryCategory}')">
+        <div class="home-result-title">${hl(e.title)}</div>
+        <div class="home-result-meta">${cat} · ${e.date}</div>
+        ${snippet ? `<div class="home-result-snippet">${hl(snippet)}</div>` : ""}
+      </div>`;
+  }).join("");
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ═══════════════════════════
+// ENTRY CARD
+// ═══════════════════════════
+const CAT_META = {
+  "ai-apps":     { emoji: "🤖", color: "#5548c8", bg: "#eeecff" },
+  "new-ideas":   { emoji: "💡", color: "#c8761a", bg: "#fef2e4" },
+  "research":    { emoji: "🔬", color: "#1f7a4a", bg: "#e8f7ed" },
+  "active-biz":  { emoji: "📊", color: "#1b6fa8", bg: "#e4f0fa" },
+  "home-family": { emoji: "🏡", color: "#b84c2a", bg: "#fdeee8" },
+  "goals":       { emoji: "🎯", color: "#1b6fa8", bg: "#e4f0fa" },
+  "contacts":    { emoji: "👤", color: "#4a5240", bg: "#eef0ea" },
+  "misc":        { emoji: "📦", color: "#7a6f60", bg: "#f3f0ea" }
+};
+
+function buildEntryCard(entry) {
+  const meta = CAT_META[entry.primaryCategory] || CAT_META["misc"];
+  const tags = (entry.tags || []).slice(0, 4).map(t =>
+    `<span class="card-tag">${t}</span>`
+  ).join("");
+
+  const kpHTML = (entry.keyPoints || []).map(k => `<li>${k}</li>`).join("");
+
+  const fileLinks = [];
+  if (entry.files?.summary)
+    fileLinks.push(`<button class="file-btn" onclick="viewFile('${entry.files.summary}')">📄 Summary</button>`);
+  if (entry.files?.transcript)
+    fileLinks.push(`<button class="file-btn" onclick="viewFile('${entry.files.transcript}')">📝 Transcript</button>`);
+  if (entry.files?.recording)
+    fileLinks.push(`<button class="file-btn" onclick="viewFile('${entry.files.recording}')">🎙 Recording</button>`);
+
+  const xrefs = [];
+  if ((entry.secondaryCategories || []).includes("new-ideas") && entry.businessIdea)
+    xrefs.push(`<button class="xref-chip" onclick="navigate('new-ideas')">💡 New Business Idea: ${entry.businessIdea.title}</button>`);
+
+  const detailSections = [];
+  if (kpHTML) detailSections.push(`
+    <div class="detail-section">
+      <div class="detail-label">Key Points</div>
+      <ul class="kp-list">${kpHTML}</ul>
+    </div>`);
+
+  if (xrefs.length) detailSections.push(`
+    <div class="detail-section">
+      <div class="detail-label">Also Referenced In</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">${xrefs.join("")}</div>
+    </div>`);
+
+  if (fileLinks.length) detailSections.push(`
+    <div class="detail-section">
+      <div class="detail-label">Source Files</div>
+      <div class="file-links">${fileLinks.join("")}</div>
+    </div>`);
+
+  if (entry.businessIdea) detailSections.push(`
+    <div class="detail-section">
+      <div class="detail-label">Business Opportunity</div>
+      <div style="font-size:13.5px;color:var(--text-primary);font-weight:600;margin-bottom:4px;">${entry.businessIdea.title}</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.55;">${entry.businessIdea.description}</div>
+    </div>`);
+
+  return `
+    <div class="entry-card" id="card-${entry.id}">
+      <div class="card-top" onclick="toggleCard('${entry.id}')">
+        <div class="card-cat-dot" style="background:${meta.bg};">${meta.emoji}</div>
+        <div class="card-body">
+          <div class="card-title">${entry.title}</div>
+          <div class="card-meta">
+            <span class="card-date">${fmtDate(entry.date)}</span>
+            ${tags}
+          </div>
+        </div>
+        <button class="card-chevron" id="chv-${entry.id}">▾</button>
+      </div>
+      <div class="card-summary">${entry.summary}</div>
+      <div class="card-detail" id="det-${entry.id}">
+        ${detailSections.join("")}
+      </div>
+    </div>`;
+}
+
+function toggleCard(id) {
+  document.getElementById(`det-${id}`).classList.toggle("open");
+  document.getElementById(`chv-${id}`).classList.toggle("open");
+}
+
+function viewFile(filename) {
+  alert(`Source file:\n${filename}\n\nOpen this file from your Recordings Management folder to view the original content.`);
+}
+
+// ═══════════════════════════
+// SEARCH HELPER
+// ═══════════════════════════
+function buildSearch(pageKey) {
+  return `
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Search…"
+        oninput="filterCards(this.value)">
+    </div>`;
+}
+
+function filterCards(q) {
+  document.querySelectorAll(".entry-card").forEach(c => {
+    c.style.display = (!q || c.textContent.toLowerCase().includes(q.toLowerCase())) ? "" : "none";
+  });
+}
+
+// ═══════════════════════════
+// DUPLICATE NOTICE
+// ═══════════════════════════
+function dupNotice() {
+  if (!DATA.duplicates.length) return "";
+  return `
+    <div class="dup-banner">
+      <span class="dup-banner-icon">⚠️</span>
+      <div>
+        <strong>${DATA.duplicates.length} duplicate file${DATA.duplicates.length > 1 ? "s" : ""} detected.</strong>
+        They have been moved to the <em>duplicates</em> folder in your Recordings Management directory.
+        Please review and delete them manually.
+        <div style="margin-top:6px;">${DATA.duplicates.map(d => `<div style="font-size:12px;color:#664d03;">• ${d}</div>`).join("")}</div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: AI APPLICATIONS
+// ═══════════════════════════
+function renderAIApps(container) {
+  const entries = getEntriesFor("ai-apps");
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">🤖 AI Applications</div>
+        <div class="page-subtitle">AI tools, research, use cases, and experiments</div>
+        <span class="count-chip">${entries.length} ${entries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      ${dupNotice()}
+      ${buildSearch("ai-apps")}
+      ${entries.length ? entries.map(buildEntryCard).join("") : emptyState("🤖", "No AI entries yet", "Recordings about AI tools and research will appear here.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: NEW BUSINESS IDEAS
+// ═══════════════════════════
+function renderNewIdeas(container) {
+  const entries = getEntriesFor("new-ideas");
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">💡 New Business Ideas</div>
+        <div class="page-subtitle">Concepts and opportunities waiting to be explored</div>
+        <span class="count-chip">${entries.length} ${entries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      ${buildSearch("new-ideas")}
+      ${entries.length ? entries.map(buildEntryCard).join("") : emptyState("💡", "No business ideas yet", "New business ideas from your recordings will appear here. These are the seeds of your next active business.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: ACTIVE BUSINESSES
+// ═══════════════════════════
+function renderActiveBiz(container) {
+  const BSUB = ["Overview", "Updates", "Goals", "Action Items", "Contacts", "Resources & Tools", "Revenue & Financials", "Open Questions", "Notes"];
+  const bizHTML = DATA.activeBusinesses.map(b => `
+    <div class="entity-card">
+      <div class="entity-header">
+        <div class="entity-icon-wrap" style="background:#e8f3ff;">📊</div>
+        <div>
+          <div class="entity-name">${b.name}</div>
+          <div class="entity-status">${b.stage || "Early Stage"}</div>
+        </div>
+      </div>
+      <div class="entity-body">
+        <div class="tab-bar">${BSUB.map((t,i)=>`<button class="tab-btn${i===0?" active":""}" onclick="switchTab(this)">${t}</button>`).join("")}</div>
+        <p style="font-size:13.5px;color:var(--text-secondary);">No content added yet for this business.</p>
+      </div>
+    </div>`).join("");
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">📊 Active Businesses</div>
+        <div class="page-subtitle">Ventures in motion — from early stage to fully operating</div>
+        <span class="count-chip">${DATA.activeBusinesses.length} ${DATA.activeBusinesses.length === 1 ? "business" : "businesses"}</span>
+      </div>
+      ${bizHTML || emptyState("📊", "No active businesses yet", "When you decide to pursue an idea, tell me and I'll promote it here with its own full dashboard.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: RESEARCH PROJECTS
+// ═══════════════════════════
+function renderResearch(container) {
+  const RSUB = ["Overview", "Key Findings", "Updates", "Goals", "Action Items", "Contacts", "Resources & Tools", "Open Questions", "Notes"];
+  const researchEntries = getEntriesFor("research");
+  const total = DATA.researchProjects.length + researchEntries.length;
+
+  const projHTML = DATA.researchProjects.map(p => `
+    <div class="entity-card">
+      <div class="entity-header" style="background:linear-gradient(135deg,#f0fff4,#e6f9ec);">
+        <div class="entity-icon-wrap" style="background:#edfaf1;">🔬</div>
+        <div>
+          <div class="entity-name">${p.name}</div>
+          <div class="entity-status">${p.status || "Active"}</div>
+        </div>
+      </div>
+      <div class="entity-body">
+        <div class="tab-bar">${RSUB.map((t,i)=>`<button class="tab-btn${i===0?" active":""}" onclick="switchTab(this)">${t}</button>`).join("")}</div>
+        <p style="font-size:13.5px;color:var(--text-secondary);">${p.description || "No content added yet for this project."}</p>
+      </div>
+    </div>`).join("");
+
+  const notesSection = researchEntries.length ? `
+    <div style="margin:20px 0 12px;font-size:11.5px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.7px;">Research Notes</div>
+    ${buildSearch("research")}
+    ${researchEntries.map(buildEntryCard).join("")}` : "";
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">🔬 Research Projects</div>
+        <div class="page-subtitle">Ongoing research, findings, and open questions</div>
+        <span class="count-chip">${total} ${total === 1 ? "item" : "items"}</span>
+      </div>
+      ${projHTML}
+      ${notesSection}
+      ${total === 0 ? emptyState("🔬", "No research projects yet", "When a research topic accumulates enough recordings, it will become its own project with full sub-sections.") : ""}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: GOALS
+// ═══════════════════════════
+function renderGoals(container) {
+  const goalsHTML = DATA.goals.map(g => {
+    const aiHTML = (g.actionItems || []).map(ai => `
+      <div class="action-row">
+        <div class="action-circle" onclick="this.classList.toggle('done')"></div>
+        <div class="action-body">
+          <div class="action-text">${ai.text}</div>
+          <div class="action-ref">→ ${g.title}</div>
+        </div>
+      </div>`).join("");
+    return `
+      <div class="goal-card">
+        <div class="goal-title">${g.title}</div>
+        <div class="goal-desc">${g.description || ""}</div>
+        ${aiHTML ? `<div class="goal-ai-label">Critical Action Items</div>${aiHTML}` : ""}
+      </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">🎯 Goals</div>
+        <div class="page-subtitle">Your defined objectives — action items are generated from these</div>
+        <span class="count-chip">${DATA.goals.length} ${DATA.goals.length === 1 ? "goal" : "goals"}</span>
+      </div>
+      ${goalsHTML || emptyState("🎯", "No goals defined yet", "When you identify a goal in a recording, it will appear here. Action items are then automatically linked to each goal.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: CRITICAL ACTION ITEMS
+// ═══════════════════════════
+function renderActionItems(container) {
+  const items = getAllActionItems();
+  const itemsHTML = items.map(ai => `
+    <div class="action-row">
+      <div class="action-circle" onclick="this.classList.toggle('done')"></div>
+      <div class="action-body">
+        <div class="action-text">${ai.text}</div>
+        <div class="action-ref">→ Goal: ${ai.goalTitle}</div>
+      </div>
+    </div>`).join("");
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">⚡ Critical Action Items</div>
+        <div class="page-subtitle">Steps required to reach your goals — each item is linked to its parent goal</div>
+        <span class="count-chip">${items.length} ${items.length === 1 ? "item" : "items"}</span>
+      </div>
+      ${itemsHTML || emptyState("⚡", "No action items yet", "Once goals are defined, I'll automatically identify the critical steps needed to reach them and list them here.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// PAGE: HOME & FAMILY
+// ═══════════════════════════
+function renderHomeFamily(container) {
+  const allEntries = getEntriesFor("home-family");
+  const HFSUB = ["Overview", "Family Members", "Home & Property", "Financial Planning", "Estate Planning", "Health & Wellness", "Education", "Travel & Experiences", "Action Items", "Research", "Notes"];
+
+  // Persist promoted research items across tab switches within the session
+  if (!window.hfActionExtras) window.hfActionExtras = [];
+
+  // Registry maps "entryId-kpIndex" → {entryTitle, text} to avoid escaping in onclick
+  const researchRegistry = {};
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">🏡 Home &amp; Family</div>
+        <div class="page-subtitle">Personal life, household, family, finances, and wellbeing</div>
+        <span class="count-chip" id="hf-count">${allEntries.length} ${allEntries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      <div class="tab-bar">${HFSUB.map((t,i)=>`<button class="tab-btn${i===0?" active":""}" onclick="switchHFTab(this,'${t}')">${t}</button>`).join("")}</div>
+      ${buildSearch("home-family")}
+      <div id="hf-content"></div>
+    </div>`;
+
+  window.promoteToHFAction = function(key, btn) {
+    if (!window.hfActionExtras.find(x => x.key === key)) {
+      window.hfActionExtras.push({ key, ...researchRegistry[key] });
+    }
+    btn.textContent = "✓ Added";
+    btn.disabled = true;
+    btn.style.color = "var(--accent)";
+    btn.style.borderColor = "var(--accent)";
+  };
+
+  window.switchHFTab = function(btn, tabName) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const filtered = tabName === "Overview"
+      ? allEntries
+      : allEntries.filter(e => e.homeSubCategory === tabName);
+    const countEl = document.getElementById("hf-count");
+    const content = document.getElementById("hf-content");
+    if (!content) return;
+
+    if (tabName === "Action Items") {
+      // Checklist: entries tagged Action Items + any items promoted from Research
+      const entryItemCount = filtered.reduce((sum, e) => sum + (e.keyPoints || []).length, 0);
+      const extraCount = (window.hfActionExtras || []).length;
+      const total = entryItemCount + extraCount;
+      if (countEl) countEl.textContent = `${total} ${total === 1 ? "item" : "items"}`;
+
+      let html = filtered.map(e => {
+        const itemsHTML = (e.keyPoints || []).map(kp => `
+          <div class="action-row">
+            <div class="action-circle" onclick="this.classList.toggle('done')"></div>
+            <div class="action-body"><div class="action-text">${kp}</div></div>
+          </div>`).join("");
+        return `<div class="section-divider">${e.title}</div>${itemsHTML}`;
+      }).join("");
+
+      if (window.hfActionExtras && window.hfActionExtras.length) {
+        const promotedHTML = window.hfActionExtras.map(item => `
+          <div class="action-row">
+            <div class="action-circle" onclick="this.classList.toggle('done')"></div>
+            <div class="action-body">
+              <div class="action-text">${item.text}</div>
+              <div class="action-ref">→ Research: ${item.entryTitle}</div>
+            </div>
+          </div>`).join("");
+        html += `<div class="section-divider">Pulled from Research</div>${promotedHTML}`;
+      }
+
+      content.innerHTML = html || emptyState("⚡", "No action items yet", "Tag entries as Action Items, or promote research notes here.");
+
+    } else if (tabName === "Research") {
+      if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}`;
+
+      if (!filtered.length) {
+        content.innerHTML = emptyState("🔬", "No research entries yet", "Memos containing research or referencing follow-up investigation will appear here.");
+        return;
+      }
+
+      content.innerHTML = filtered.map(e => {
+        const kpHTML = (e.keyPoints || []).map((kp, i) => {
+          const key = `${e.id}-${i}`;
+          researchRegistry[key] = { entryTitle: e.title, text: kp };
+          const alreadyAdded = !!(window.hfActionExtras || []).find(x => x.key === key);
+          return `
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+              <div style="flex:1;font-size:13.5px;color:var(--text-primary);line-height:1.5">${kp}</div>
+              <button
+                onclick="window.promoteToHFAction('${key}',this)"
+                ${alreadyAdded ? "disabled" : ""}
+                style="flex-shrink:0;font-size:11px;padding:3px 9px;border:1px solid ${alreadyAdded ? "var(--accent)" : "var(--border)"};color:${alreadyAdded ? "var(--accent)" : "var(--text-secondary)"};background:transparent;border-radius:6px;cursor:${alreadyAdded ? "default" : "pointer"};white-space:nowrap;transition:all 0.15s"
+                onmouseover="if(!this.disabled){this.style.borderColor='var(--accent)';this.style.color='var(--accent)'}"
+                onmouseout="if(!this.disabled){this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'}">
+                ${alreadyAdded ? "✓ Added" : "+ Action"}
+              </button>
+            </div>`;
+        }).join("");
+
+        return `
+          <div class="entry-card" style="margin-bottom:12px">
+            <div style="font-weight:600;font-size:14.5px;margin-bottom:6px;color:var(--text-primary)">${e.title}</div>
+            <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">${e.summary}</div>
+            ${kpHTML || "<div style='font-size:13px;color:var(--text-tertiary)'>No key points extracted.</div>"}
+          </div>`;
+      }).join("");
+
+    } else {
+      if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}`;
+      content.innerHTML = filtered.length
+        ? filtered.map(buildEntryCard).join("")
+        : emptyState("🏡", `No entries in "${tabName}"`, "Recordings tagged to this subcategory will appear here.");
+    }
+  };
+
+  // Trigger initial render
+  window.switchHFTab(document.querySelector(".tab-btn"), "Overview");
+}
+
+// ═══════════════════════════
+// PAGE: CONTACTS
+// ═══════════════════════════
+function renderContacts(container) {
+  const needsFU = DATA.contacts.filter(c => c.needsFollowUp && !c.markedForDelete);
+  const confirmed = DATA.contacts.filter(c => !c.needsFollowUp && !c.markedForDelete);
+
+  const fuHTML = needsFU.map(c => `
+    <div class="contact-row needs-fu" id="crow-${c.id}">
+      <div class="contact-avatar fu">${c.name[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}<span class="fu-badge">First Name Only</span></div>
+        <div class="contact-source">Mentioned in: ${c.source || "Unknown"}</div>
+      </div>
+      <div class="toggle-wrap">
+        <span>Delete</span>
+        <button class="toggle-switch" onclick="toggleContactDelete('${c.id}', this)"></button>
+      </div>
+    </div>`).join("");
+
+  const confHTML = confirmed.map(c => {
+    const initials = c.name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+    const details = [];
+    if (c.phone) details.push(`<a href="tel:${c.phone.replace(/\D/g,'')}" style="color:var(--accent);text-decoration:none">📞 ${c.phone}</a>`);
+    if (c.email) details.push(`<a href="mailto:${c.email}" style="color:var(--accent);text-decoration:none">✉️ ${c.email}</a>`);
+    if (c.address) details.push(`<span>📍 ${c.address}</span>`);
+    return `
+      <div class="contact-row">
+        <div class="contact-avatar">${initials}</div>
+        <div class="contact-info">
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-source" style="margin-bottom:${details.length ? '5px' : '0'}">${c.source || "Unknown"}</div>
+          ${details.length ? `<div style="display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--text-secondary)">${details.join("")}</div>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">👥 Contacts</div>
+        <div class="page-subtitle">Automatically extracted from your recordings</div>
+        <span class="count-chip">${DATA.contacts.length} ${DATA.contacts.length === 1 ? "contact" : "contacts"}</span>
+      </div>
+      ${needsFU.length ? `<div class="section-divider">⚠ Needs Follow-Up (first name only)</div>${fuHTML}` : ""}
+      ${confirmed.length ? `<div class="section-divider">Confirmed Contacts</div>${confHTML}` : ""}
+      ${DATA.contacts.length === 0 ? emptyState("👥", "No contacts yet", "People mentioned in your recordings are added automatically. Full names are confirmed; first names only are flagged for follow-up.") : ""}
+    </div>`;
+}
+
+function toggleContactDelete(id, btn) {
+  btn.classList.toggle("on");
+  const c = DATA.contacts.find(x => x.id === id);
+  if (c) {
+    c.markedForDelete = btn.classList.contains("on");
+    const row = document.getElementById(`crow-${id}`);
+    if (row) row.style.opacity = c.markedForDelete ? "0.45" : "1";
+  }
+}
+
+// ═══════════════════════════
+// PAGE: MISCELLANEOUS
+// ═══════════════════════════
+function renderMisc(container) {
+  const entries = getEntriesFor("misc");
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">📦 Miscellaneous</div>
+        <div class="page-subtitle">Items that don't fit neatly into other categories</div>
+        <span class="count-chip">${entries.length} ${entries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      ${buildSearch("misc")}
+      ${entries.length ? entries.map(buildEntryCard).join("") : emptyState("📦", "Nothing here yet", "Recordings that don't fit other categories will be placed here.")}
+    </div>`;
+}
+
+// ═══════════════════════════
+// SHARED UTILS
+// ═══════════════════════════
+function emptyState(icon, title, body) {
+  return `
+    <div class="empty-state">
+      <div class="empty-icon">${icon}</div>
+      <div class="empty-title">${title}</div>
+      <div class="empty-body">${body}</div>
+    </div>`;
+}
+
+function renderEmpty(container) {
+  container.innerHTML = emptyState("🚧", "Coming soon", "This section is being built.");
+}
+
+function switchTab(btn) {
+  const bar = btn.closest(".tab-bar");
+  bar.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// ═══════════════════════════
+// ROUTE MAP
+// ═══════════════════════════
+const RENDERERS = {
+  "home":         renderHome,
+  "active-biz":   renderActiveBiz,
+  "new-ideas":    renderNewIdeas,
+  "goals":        renderGoals,
+  "action-items": renderActionItems,
+  "research":     renderResearch,
+  "ai-apps":      renderAIApps,
+  "home-family":  renderHomeFamily,
+  "contacts":     renderContacts,
+  "misc":         renderMisc
+};
+
+// ═══════════════════════════
+// BADGES
+// ═══════════════════════════
+function updateBadges() {
+  const counts = {
+    "active-biz":   DATA.activeBusinesses.length,
+    "new-ideas":    getEntriesFor("new-ideas").length,
+    "goals":        DATA.goals.length,
+    "action-items": getAllActionItems().length,
+    "research":     DATA.researchProjects.length + getEntriesFor("research").length,
+    "ai-apps":      getEntriesFor("ai-apps").length,
+    "home-family":  getEntriesFor("home-family").length,
+    "contacts":     DATA.contacts.length,
+    "misc":         getEntriesFor("misc").length
+  };
+  Object.entries(counts).forEach(([key, val]) => {
+    const el = document.getElementById(`badge-${key}`);
+    if (el) {
+      el.textContent = val;
+      el.classList.toggle("visible", val > 0);
+    }
+  });
+  const footer = document.getElementById("footer-updated");
+  if (footer) {
+    footer.textContent = "Updated " + fmtDate(DATA.meta.lastUpdated);
+  }
+}
+
+// ═══════════════════════════
+// INIT
+// ═══════════════════════════
+updateBadges();
+navigate("home");
+</script>
+</body>
+</html>
