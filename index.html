@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -762,115 +763,234 @@
   /* ── UTILS ── */
   .hidden { display: none !important; }
 
-  /* ── MOBILE RESPONSIVE ── */
+  /* ── DEFINITIONS PAGE ── */
+  .alpha-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 26px;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .alpha-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.13s ease;
+    font-family: var(--font);
+  }
+  .alpha-btn:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .alpha-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 2px 6px rgba(200,118,26,0.35);
+  }
+  .alpha-btn.disabled {
+    opacity: 0.28;
+    cursor: default;
+    pointer-events: none;
+  }
+  .def-letter-group {
+    margin-bottom: 10px;
+  }
+  .def-letter-heading {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    padding: 14px 0 8px;
+    border-bottom: 2px solid var(--accent-light);
+    margin-bottom: 6px;
+  }
+  .def-item {
+    display: flex;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .def-item:last-child { border-bottom: none; }
+  .def-term {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--text-primary);
+    min-width: 220px;
+    max-width: 220px;
+    flex-shrink: 0;
+    letter-spacing: -0.2px;
+    line-height: 1.4;
+    padding-top: 1px;
+  }
+  .def-meaning {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    flex: 1;
+  }
+  .def-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-tertiary);
+    font-size: 14px;
+  }
   @media (max-width: 768px) {
-    /* Stack layout: sidebar → bottom nav bar */
-    #app {
-      flex-direction: column-reverse;
-      height: 100vh;
-      height: 100dvh;
-    }
+    .alpha-bar { padding: 10px 10px; gap: 3px; }
+    .alpha-btn { width: 26px; height: 26px; font-size: 11px; }
+    .def-term { min-width: 120px; max-width: 120px; font-size: 13px; }
+    .def-meaning { font-size: 13px; }
+    .def-letter-heading { font-size: 18px; }
+  }
 
-    /* Sidebar becomes a compact horizontal bottom tab bar */
-    #sidebar {
-      width: 100%;
-      min-width: 100%;
-      height: auto;
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      flex-shrink: 0;
-      padding: 4px 6px env(safe-area-inset-bottom, 0px);
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* Hide header, footer and section labels in bottom nav */
-    .sidebar-header,
-    .sidebar-footer,
-    .nav-section { display: none; }
-
-    /* Horizontal scrolling nav row */
-    .sidebar-nav {
-      padding: 0;
-      flex: none;
-      display: flex;
-      flex-direction: row;
-      gap: 2px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      width: 100%;
-      align-items: center;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    /* Compact icon+label column items */
-    .nav-item {
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      padding: 5px 8px;
-      border-radius: 8px;
-      font-size: 9px;
-      min-width: 54px;
-      text-align: center;
-      white-space: nowrap;
-      margin-bottom: 0;
-    }
-    .nav-icon { font-size: 17px; width: auto; }
-    .nav-label { font-size: 9px; line-height: 1.2; }
-    .nav-badge { display: none !important; }
-
-    /* Main content fills all remaining space */
-    #main {
-      flex: 1;
-      height: 0;
-      overflow-y: auto;
-    }
-
-    /* ── Home page ── */
-    .home-content { padding: 24px 18px 18px; }
-    .home-name { font-size: 34px; letter-spacing: -1.5px; }
-    .home-date { font-size: 14px; }
-    .home-greeting { font-size: 11px; }
-    .home-search-wrap { margin: 18px 0 14px; }
-    .home-search-field { max-width: 100%; }
-    .home-search-input { font-size: 14px; padding: 11px 14px 11px 40px; }
-    .home-search-results { max-width: 100%; }
-    .home-stats { gap: 8px; }
-    .stat-pill { min-width: 90px; padding: 10px 12px; }
-    .stat-num { font-size: 22px; }
-    .stat-lbl { font-size: 10px; }
-
-    /* ── Category pages ── */
-    .cat-page { padding: 20px 14px 36px; }
-    .page-title { font-size: 22px; }
-    .page-subtitle { font-size: 13px; }
-
-    /* ── Entry cards ── */
-    .card-top { padding: 12px 14px 10px; gap: 10px; }
-    .card-cat-dot { width: 28px; height: 28px; font-size: 14px; }
-    .card-title { font-size: 13.5px; }
-    .card-summary { padding: 0 14px 12px 14px; font-size: 13px; }
-    .detail-section { padding: 12px 14px; }
-
-    /* ── Entity cards ── */
-    .entity-header { padding: 14px 16px; gap: 10px; }
-    .entity-icon-wrap { width: 38px; height: 38px; font-size: 18px; }
-    .entity-name { font-size: 15px; }
-    .entity-body { padding: 14px 16px 18px; }
-
-    /* ── Goal cards ── */
-    .goal-card { padding: 14px 16px; }
-    .goal-title { font-size: 14px; }
-
-    /* ── Action rows ── */
-    .action-row { padding: 11px 12px; }
-    .action-text { font-size: 13px; }
-
-    /* ── Contact rows ── */
-    .contact-row { padding: 12px 14px; gap: 10px; }
-    .contact-avatar { width: 34px; height: 34px; font-size: 13px; }
-    .contact-name { font-size: 13px; }
+  /* ── TRAVEL TAB ── */
+  .trip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 10px;
+  }
+  .trip-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow 0.18s, transform 0.18s;
+  }
+  .trip-card.has-trip:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .trip-card-header {
+    padding: 18px 20px 16px;
+    background: linear-gradient(135deg, #1a3545, #2a556a);
+    color: white;
+  }
+  .trip-card-header.empty-header {
+    background: linear-gradient(135deg, #2c2c2c, #3e3e3e);
+  }
+  .trip-slot-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 5px;
+  }
+  .trip-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+  }
+  .trip-dates-line {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 5px;
+  }
+  .trip-countdown-wrap {
+    padding: 13px 20px 12px;
+    background: var(--accent-light);
+    border-bottom: 1px solid rgba(200,118,26,0.15);
+  }
+  .trip-countdown-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .trip-countdown {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .countdown-unit { text-align: center; min-width: 38px; }
+  .countdown-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .countdown-lbl {
+    font-size: 8.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-tertiary);
+    margin-top: 3px;
+  }
+  .countdown-sep {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.4;
+    padding-bottom: 8px;
+    line-height: 1;
+  }
+  .trip-underway-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e6f9ec;
+    color: #1b7a3e;
+    border: 1px solid #b5e8c8;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 13px 20px 12px;
+  }
+  .trip-body { padding: 16px 20px 20px; }
+  .trip-empty-body {
+    padding: 28px 20px 32px;
+    text-align: center;
+  }
+  .trip-empty-icon { font-size: 32px; opacity: 0.25; margin-bottom: 9px; }
+  .trip-empty-label { font-size: 12.5px; color: var(--text-tertiary); line-height: 1.5; }
+  .trip-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-tertiary);
+    margin: 14px 0 6px;
+  }
+  .trip-section-label:first-child { margin-top: 0; }
+  .trip-detail-row {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  .trip-detail-row:last-child { border-bottom: none; }
+  .trip-detail-icon { flex-shrink: 0; width: 18px; text-align: center; opacity: 0.75; }
+  .trip-detail-text { flex: 1; }
+  .trip-detail-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+  @media (max-width: 768px) {
+    .trip-grid { grid-template-columns: 1fr; gap: 14px; }
+    .trip-name { font-size: 15px; }
+    .countdown-num { font-size: 22px; }
   }
 </style>
 </head>
@@ -925,6 +1045,10 @@
         <span class="nav-label">AI Applications</span>
         <span class="nav-badge" id="badge-ai-apps">0</span>
       </div>
+      <div class="nav-item" data-page="definitions" onclick="navigate('definitions')">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">Definitions</span>
+      </div>
 
       <div class="nav-section">Personal</div>
       <div class="nav-item" data-page="home-family" onclick="navigate('home-family')">
@@ -964,7 +1088,7 @@
 const DATA = {
   meta: {
     owner: "Sam Gordon",
-    lastUpdated: "2026-05-02",
+    lastUpdated: "2026-05-03",
     version: "1.0"
   },
 
@@ -1425,7 +1549,7 @@ const DATA = {
       },
       contacts: [],
       goalRefs: [],
-      homeSubCategory: "Action Items",
+      homeSubCategory: "Canadian Citizenship",
       tags: ["citizenship", "Canada", "personal", "family", "legal", "immigration"]
     },
     {
@@ -1584,6 +1708,31 @@ const DATA = {
       goalRefs: [],
       homeSubCategory: "Action Items",
       tags: ["HOA", "home", "AI", "legal", "neighbors", "rules summary"]
+    },
+    {
+      id: "e027",
+      title: "Canadian Citizenship — Action Checklist",
+      date: "2026-04-30",
+      dateAdded: "2026-05-03",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Step-by-step action checklist to complete Sam's Canadian citizenship application by December 31, 2026.",
+      keyPoints: [
+        "Call IRCC at 1-888-242-2100 to inquire about mother's citizenship status without an attorney",
+        "Locate or request mother's Canadian citizenship certificate or passport as primary proof",
+        "Obtain Sam's long-form birth certificate showing mother's full name",
+        "Download and complete Form CIT 0001 from canada.ca",
+        "Gather all required supporting documents: birth certificate, parent's citizenship proof, ID, passport photos",
+        "Create an IRCC secure account online at canada.ca and submit application electronically",
+        "Pay the ~$100 CAD filing fee at time of submission",
+        "Track application status through the IRCC online portal",
+        "Upon receiving citizenship certificate, apply for a Canadian passport"
+      ],
+      files: { summary: "04-30 Personal Plan_ Canadian Citizenship-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Canadian Citizenship",
+      tags: ["citizenship", "Canada", "checklist", "action items", "IRCC", "application", "legal"]
     }
   ],
 
@@ -1658,50 +1807,65 @@ const DATA = {
       markedForDelete: false,
       source: "Bein Performance Horses (beinperformancehorses.com)",
       notes: "Trainer and Instructor at Bein Performance Horses."
+    },
+    {
+      id: "c006",
+      name: "India Gordon",
+      needsFollowUp: false,
+      markedForDelete: false,
+      source: "Family — Daughter",
+      email: "igordon3@pvlearners.net",
+      notes: "Sam's daughter. School email: igordon3@pvlearners.net"
     }
   ],
 
-  familyMembers: [
+  people: [
     {
-      id: "fm001",
+      id: "p001",
+      name: "Sam Gordon",
+      relationship: "Self",
+      email: "samgordon66@gmail.com",
+      phone: "",
+      address: "7513 E. Whistling Wind Way, Scottsdale, AZ 85255",
+      occupation: "Attorney & AI Consultant",
+      notes: ""
+    },
+    {
+      id: "p002",
       name: "Karen Kessler Gordon",
-      relation: "Spouse",
-      emoji: "👩",
-      phone: "509-868-9598",
+      relationship: "Spouse",
       email: "karengordon@therapysecur.com",
+      phone: "509-868-9598",
       address: "7513 E. Whistling Wind Way, Scottsdale, AZ 85255",
-      occupation: "Founder & Therapist — Flourish Counseling",
-      credentials: "MS, LICSW",
-      notes: []
+      occupation: "Founder & Therapist, Flourish Counseling",
+      credentials: "MS, LICWS",
+      notes: ""
     },
     {
-      id: "fm002",
+      id: "p003",
       name: "India Paige Gordon",
-      relation: "Daughter",
-      emoji: "👧",
-      dob: "March 16, 2009",
-      phone: "480-843-8689",
+      relationship: "Daughter",
+      dob: "03/16/2009",
       email: "indiagordon27@gmail.com",
+      email2: "igordon3@pvlearners.net",
+      phone: "480-843-8689",
       address: "7513 E. Whistling Wind Way, Scottsdale, AZ 85255",
-      school: "Pinnacle High School (Senior)",
-      nextStep: "Delaware State University — Fall 2027",
-      notes: ["Equestrian — horse is TA Olyvia, a Purebred Arabian"]
+      occupation: "Senior, Pinnacle High School — Attending Delaware State University Fall 2027",
+      notes: "Competitive equestrian. Horse: TA Olyvia (Purebred Arabian)."
     },
     {
-      id: "fm003",
+      id: "p004",
       name: "Blu",
-      relation: "Pet — Australian Labradoodle",
-      emoji: "🐶",
-      dob: "May 20, 2023",
-      notes: []
+      relationship: "Australian Labradoodle",
+      dob: "05/20/2023",
+      notes: ""
     },
     {
-      id: "fm004",
+      id: "p005",
       name: "TA Olyvia",
-      relation: "Horse — Purebred Arabian",
-      emoji: "🐴",
-      dob: "April 16, 2010",
-      notes: ["India's equestrian horse"]
+      relationship: "Purebred Arabian Horse",
+      dob: "04/16/2010",
+      notes: "India's horse. Trains at Bein Performance Horses, Scottsdale, AZ."
     }
   ],
 
@@ -1736,7 +1900,34 @@ const DATA = {
 
   duplicates: [
     "05-01 The Paradigm Shift in AI Automation_ From GUI-Based Integration to Generative Code-Based Agents-Summary.txt"
-  ]
+  ],
+
+  // ── TRAVEL ──
+  // Each trip: { slot, originalLabel, label, data }
+  // data is null when empty. When loaded, data contains:
+  //   { destination, departureDate (YYYY-MM-DD), returnDate (YYYY-MM-DD),
+  //     flights[], hotels[], activities[], notes }
+  // Auto-expiry: 24 hours after returnDate, data is treated as cleared.
+  travel: {
+    trips: [
+      { slot: 1, originalLabel: "Trip 1", label: "Huntington Beach", data: {
+        destination: "Huntington Beach, CA",
+        departureDate: "2026-07-03",
+        returnDate: "2026-07-07",
+        flights: [],
+        hotels: [
+          {
+            name: "Home in Huntington Beach – Hosted by HB Surf",
+            details: "7641 Amazon Drive, Huntington Beach, CA 92647 · Check-in: Jul 3 @ 4:00 PM · Check-out: Jul 7 @ 11:00 AM · Conf: HME5JZQJAN"
+          }
+        ],
+        activities: [],
+        notes: "3 guests, 3 children, 1 pet. Free cancellation before 4:00 PM Jun 3. Partial refund if cancelled before 4:00 PM Jun 26."
+      }},
+      { slot: 2, originalLabel: "Trip 2", label: "Trip 2", data: null },
+      { slot: 3, originalLabel: "Trip 3", label: "Trip 3", data: null }
+    ]
+  }
 };
 
 // ═══════════════════════════
@@ -2246,7 +2437,7 @@ function renderActionItems(container) {
 // ═══════════════════════════
 function renderHomeFamily(container) {
   const allEntries = getEntriesFor("home-family");
-  const HFSUB = ["Overview", "Action Items", "Education", "Estate Planning", "Family Members", "Financial Planning", "Health & Wellness", "Home & Property", "Notes", "Research", "Travel & Experiences"];
+  const HFSUB = ["Overview", "Family Members", "Canadian Citizenship", "Home & Property", "Financial Planning", "Estate Planning", "Health & Wellness", "Education", "Travel", "Action Items", "Research", "Notes"];
 
   // Persist promoted research items across tab switches within the session
   if (!window.hfActionExtras) window.hfActionExtras = [];
@@ -2280,7 +2471,7 @@ function renderHomeFamily(container) {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     const filtered = tabName === "Overview"
-      ? allEntries
+      ? allEntries.filter(e => e.homeSubCategory !== "Canadian Citizenship")
       : allEntries.filter(e => e.homeSubCategory === tabName);
     const countEl = document.getElementById("hf-count");
     const content = document.getElementById("hf-content");
@@ -2351,40 +2542,160 @@ function renderHomeFamily(container) {
           </div>`;
       }).join("");
 
-    } else if (tabName === "Family Members") {
-      if (countEl) countEl.textContent = `${DATA.familyMembers.length} members`;
-      const row = (label, value, isLink, linkHref) => value ? `
-        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px">
-          <span style="font-size:10.5px;color:var(--text-tertiary);min-width:78px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px">${label}</span>
-          ${isLink ? `<a href="${linkHref}" style="font-size:13.5px;color:var(--accent);text-decoration:none;line-height:1.45">${value}</a>` : `<span style="font-size:13.5px;color:var(--text-primary);line-height:1.45">${value}</span>`}
-        </div>` : "";
-      content.innerHTML = DATA.familyMembers.map(m => `
-        <div class="entity-card" style="margin-bottom:16px">
-          <div class="entity-header" style="cursor:default">
-            <div class="entity-icon-wrap" style="background:linear-gradient(135deg,#f0ebe0,#e8dfce);font-size:26px">${m.emoji}</div>
+    } else if (tabName === "Travel") {
+      if (countEl) countEl.textContent = "3 trip slots";
+      renderTravelContent(content);
+
+    } else if (tabName === "Canadian Citizenship") {
+      if (countEl) countEl.textContent = "Goal: Dec 31, 2026";
+      const citizenEntry = allEntries.find(e => e.id === "e018") || {};
+      const checklistEntry = allEntries.find(e => e.id === "e027") || {};
+      const checkItems = checklistEntry.keyPoints || [];
+      content.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+          <!-- Goal Banner -->
+          <div style="background:linear-gradient(135deg,#c8251a,#e8524a);border-radius:12px;padding:18px 22px;color:#fff;display:flex;align-items:center;gap:16px;">
+            <span style="font-size:32px;">🍁</span>
             <div>
-              <div class="entity-name">${m.name}</div>
-              <div class="entity-status">${m.relation}</div>
+              <div style="font-size:16px;font-weight:700;letter-spacing:-0.01em;">Canadian Citizenship by Descent</div>
+              <div style="font-size:13px;opacity:0.9;margin-top:3px;">Apply through mother's citizenship status · Deadline: December 31, 2026</div>
             </div>
           </div>
-          <div class="entity-body">
-            ${row("Born", m.dob)}
-            ${row("Phone", m.phone, true, `tel:${(m.phone||"").replace(/\D/g,"")}`)}
-            ${row("Email", m.email, true, `mailto:${m.email}`)}
-            ${row("Address", m.address)}
-            ${row("Work", m.occupation)}
-            ${row("Credentials", m.credentials)}
-            ${row("School", m.school)}
-            ${row("Next step", m.nextStep)}
-            ${m.notes && m.notes.length ? `
-              <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-                ${m.notes.map(n => `
-                  <div style="font-size:13.5px;color:var(--text-secondary);padding:4px 0 4px 16px;position:relative;line-height:1.5">
-                    <span style="position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block"></span>${n}
-                  </div>`).join("")}
-              </div>` : ""}
+
+          <!-- Guidebook Link -->
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);margin-bottom:12px;">📖 Citizenship Guidebook</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <div style="font-size:14px;color:var(--text-primary);line-height:1.5;">
+                Complete reference guide covering eligibility, required documents, the IRCC application process, fees, and timelines for obtaining Canadian citizenship by descent.
+              </div>
+              <a href="computer://C:\\Users\\samgo\\OneDrive\\Documents\\Claude\\Projects\\Recordings%20Management\\Inbox\\04-30%20Personal%20Plan_%20Canadian%20Citizenship-Summary.txt"
+                 style="flex-shrink:0;background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;">
+                Open Guidebook →
+              </a>
+            </div>
           </div>
-        </div>`).join("");
+
+          <!-- Eligibility & Key Facts -->
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);margin-bottom:12px;">⚖️ Eligibility & Key Facts</div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              ${(citizenEntry.keyPoints || [
+                "Eligibility: born abroad to a Canadian citizen parent qualifies as citizenship by descent (first generation only)",
+                "Potential qualification path: citizenship through mother's Canadian citizenship under new eligibility rules",
+                "Critical uncertainty: mother's current citizenship status needs verification",
+                "Approach: verify status without the cost of hiring an attorney",
+                "Required form: CIT 0001 — Application for a Citizenship Certificate",
+                "Fee: approximately $100 CAD · Processing time: 5–12 months",
+                "IRCC contact: 1-888-242-2100 · Website: canada.ca/en/immigration-refugees-citizenship"
+              ]).map(pt => `
+                <div style="display:flex;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.5;color:var(--text-primary);">
+                  <span style="color:#c8251a;flex-shrink:0;margin-top:1px;">🍁</span>
+                  <span>${pt}</span>
+                </div>`).join("")}
+            </div>
+          </div>
+
+          <!-- Required Documents -->
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);margin-bottom:12px;">📋 Required Documents</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${[
+                "Sam's long-form birth certificate showing mother's full name",
+                "Mother's proof of Canadian citizenship (passport or citizenship certificate)",
+                "Proof of parent-child relationship",
+                "Government-issued photo ID",
+                "Passport-style photos",
+                "Completed Form CIT 0001"
+              ].map(doc => `
+                <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-primary);">
+                  <div onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✅':'☐'"
+                       style="cursor:pointer;font-size:16px;flex-shrink:0;user-select:none;">☐</div>
+                  <span>${doc}</span>
+                </div>`).join("")}
+            </div>
+          </div>
+
+          <!-- Action Items Checklist -->
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);margin-bottom:12px;">⚡ Action Checklist</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              ${(checkItems.length ? checkItems : [
+                "Call IRCC at 1-888-242-2100 to inquire about mother's citizenship status without an attorney",
+                "Locate or request mother's Canadian citizenship certificate or passport as primary proof",
+                "Obtain Sam's long-form birth certificate showing mother's full name",
+                "Download and complete Form CIT 0001 from canada.ca",
+                "Gather all required supporting documents: birth certificate, parent's citizenship proof, ID, passport photos",
+                "Create an IRCC secure account online at canada.ca and submit application electronically",
+                "Pay the ~$100 CAD filing fee at time of submission",
+                "Track application status through the IRCC online portal",
+                "Upon receiving citizenship certificate, apply for a Canadian passport"
+              ]).map(item => `
+                <div class="action-row">
+                  <div class="action-circle" onclick="this.classList.toggle('done')"></div>
+                  <div class="action-body"><div class="action-text">${item}</div></div>
+                </div>`).join("")}
+            </div>
+          </div>
+
+          <!-- Key Contacts & Resources -->
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-secondary);margin-bottom:12px;">📞 Key Contacts & Resources</div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;">
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <span>🏛️</span>
+                <div><strong>IRCC (Immigration, Refugees and Citizenship Canada)</strong><br>
+                  <a href="tel:18882422100" style="color:var(--accent);text-decoration:none;">📞 1-888-242-2100</a> &nbsp;·&nbsp;
+                  <a href="https://canada.ca/en/immigration-refugees-citizenship" target="_blank" style="color:var(--accent);text-decoration:none;">canada.ca/ircc ↗</a>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <span>📝</span>
+                <div><strong>Form CIT 0001</strong> — Application for a Citizenship Certificate (Proof of Citizenship)<br>
+                  <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/application-forms-guides/cit0001.html" target="_blank" style="color:var(--accent);text-decoration:none;">Download Form CIT 0001 ↗</a>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <span>🌐</span>
+                <div><strong>Citizenship by Descent Info</strong><br>
+                  <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship/become-canadian-citizen/eligibility/already-citizen.html" target="_blank" style="color:var(--accent);text-decoration:none;">canada.ca — Citizenship by Descent ↗</a>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <span>🛂</span>
+                <div><strong>Canadian Passport Application</strong> (after citizenship certificate received)<br>
+                  <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports.html" target="_blank" style="color:var(--accent);text-decoration:none;">Passport Canada ↗</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>`;
+
+    } else if (tabName === "Family Members") {
+      if (countEl) countEl.textContent = `${DATA.people.length} members`;
+      const memberHTML = DATA.people.map(p => {
+        const initials = p.name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+        const details = [];
+        if (p.dob) details.push(`<span>🎂 DOB: ${p.dob}</span>`);
+        if (p.occupation) details.push(`<span>💼 ${p.occupation}${p.credentials ? " — " + p.credentials : ""}</span>`);
+        if (p.phone) details.push(`<a href="tel:${p.phone.replace(/\D/g,'')}" style="color:var(--accent);text-decoration:none">📞 ${p.phone}</a>`);
+        if (p.email) details.push(`<a href="mailto:${p.email}" style="color:var(--accent);text-decoration:none">✉️ ${p.email}</a>`);
+        if (p.email2) details.push(`<a href="mailto:${p.email2}" style="color:var(--accent);text-decoration:none">✉️ ${p.email2} <span style="font-size:10px;opacity:0.7">(school)</span></a>`);
+        if (p.address) details.push(`<span>📍 ${p.address}</span>`);
+        if (p.notes) details.push(`<span style="color:var(--text-secondary);font-style:italic">${p.notes}</span>`);
+        return `
+          <div class="contact-row">
+            <div class="contact-avatar">${initials}</div>
+            <div class="contact-info">
+              <div class="contact-name">${p.name}</div>
+              <div class="contact-source" style="margin-bottom:${details.length ? '6px' : '0'}">${p.relationship}</div>
+              ${details.length ? `<div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-secondary)">${details.join("")}</div>` : ""}
+            </div>
+          </div>`;
+      }).join("");
+      content.innerHTML = memberHTML || emptyState("👨‍👩‍👧", "No family members yet", "");
 
     } else {
       if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}`;
@@ -2396,6 +2707,177 @@ function renderHomeFamily(container) {
 
   // Trigger initial render
   window.switchHFTab(document.querySelector(".tab-btn"), "Overview");
+}
+
+// ═══════════════════════════
+// TRAVEL HELPERS
+// ═══════════════════════════
+
+// Returns ms until the given YYYY-MM-DD date (start of that day local time)
+function msUntil(dateStr) {
+  return new Date(dateStr + "T00:00:00").getTime() - Date.now();
+}
+
+// Returns true if the trip has expired (return date + 24 hrs has passed)
+function tripExpired(trip) {
+  if (!trip.data || !trip.data.returnDate) return false;
+  const expiry = new Date(trip.data.returnDate + "T00:00:00").getTime() + 86400000;
+  return Date.now() > expiry;
+}
+
+// Returns true if the trip is currently underway (departed but not yet expired)
+function tripUnderway(trip) {
+  if (!trip.data || !trip.data.departureDate || !trip.data.returnDate) return false;
+  const dep = new Date(trip.data.departureDate + "T00:00:00").getTime();
+  const expiry = new Date(trip.data.returnDate + "T00:00:00").getTime() + 86400000;
+  const now = Date.now();
+  return now >= dep && now < expiry;
+}
+
+function fmtTripDate(str) {
+  if (!str) return "";
+  const d = new Date(str + "T12:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function buildTripCard(trip) {
+  // Auto-expiry check: treat as empty if past return+24h
+  const expired = tripExpired(trip);
+  const underway = tripUnderway(trip);
+  const hasData = trip.data && !expired;
+
+  if (!hasData) {
+    // Empty / expired slot
+    return `
+      <div class="trip-card">
+        <div class="trip-card-header empty-header">
+          <div class="trip-slot-label">${trip.originalLabel}</div>
+          <div class="trip-name" style="opacity:0.45">No trip planned</div>
+        </div>
+        <div class="trip-empty-body">
+          <div class="trip-empty-icon">✈️</div>
+          <div class="trip-empty-label">Upload an itinerary to activate<br>this trip slot</div>
+        </div>
+      </div>`;
+  }
+
+  const d = trip.data;
+  const depStr = fmtTripDate(d.departureDate);
+  const retStr = fmtTripDate(d.returnDate);
+
+  // Countdown or underway badge
+  let countdownHTML = "";
+  if (underway) {
+    countdownHTML = `<div class="trip-underway-badge">🟢 Trip underway — returns ${retStr}</div>`;
+  } else {
+    // Build live countdown block (IDs scoped to slot)
+    const id = `cd-${trip.slot}`;
+    countdownHTML = `
+      <div class="trip-countdown-wrap">
+        <div class="trip-countdown-label">⏱ Departure countdown</div>
+        <div class="trip-countdown">
+          <div class="countdown-unit"><div class="countdown-num" id="${id}-d">--</div><div class="countdown-lbl">Days</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="${id}-h">--</div><div class="countdown-lbl">Hrs</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="${id}-m">--</div><div class="countdown-lbl">Min</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="${id}-s">--</div><div class="countdown-lbl">Sec</div></div>
+        </div>
+      </div>`;
+  }
+
+  // Build body sections
+  let bodyHTML = "";
+
+  if (d.flights && d.flights.length) {
+    bodyHTML += `<div class="trip-section-label">✈️ Flights</div>`;
+    bodyHTML += d.flights.map(f => `
+      <div class="trip-detail-row">
+        <div class="trip-detail-icon">🛫</div>
+        <div class="trip-detail-text">
+          <div>${f.route || ""}</div>
+          ${f.details ? `<div class="trip-detail-sub">${f.details}</div>` : ""}
+        </div>
+      </div>`).join("");
+  }
+
+  if (d.hotels && d.hotels.length) {
+    bodyHTML += `<div class="trip-section-label">🏨 Accommodations</div>`;
+    bodyHTML += d.hotels.map(h => `
+      <div class="trip-detail-row">
+        <div class="trip-detail-icon">🏨</div>
+        <div class="trip-detail-text">
+          <div>${h.name || ""}</div>
+          ${h.details ? `<div class="trip-detail-sub">${h.details}</div>` : ""}
+        </div>
+      </div>`).join("");
+  }
+
+  if (d.activities && d.activities.length) {
+    bodyHTML += `<div class="trip-section-label">📍 Activities & Highlights</div>`;
+    bodyHTML += d.activities.map(a => `
+      <div class="trip-detail-row">
+        <div class="trip-detail-icon">📌</div>
+        <div class="trip-detail-text">
+          <div>${a.name || ""}</div>
+          ${a.details ? `<div class="trip-detail-sub">${a.details}</div>` : ""}
+        </div>
+      </div>`).join("");
+  }
+
+  if (d.notes) {
+    bodyHTML += `<div class="trip-section-label">📝 Notes</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">${d.notes}</div>`;
+  }
+
+  return `
+    <div class="trip-card has-trip">
+      <div class="trip-card-header">
+        <div class="trip-slot-label">${trip.originalLabel}</div>
+        <div class="trip-name">${trip.label}</div>
+        <div class="trip-dates-line">📅 ${depStr} → ${retStr}</div>
+      </div>
+      ${countdownHTML}
+      <div class="trip-body">${bodyHTML || "<div style='font-size:13px;color:var(--text-tertiary);text-align:center;padding:10px 0'>No itinerary details yet.</div>"}</div>
+    </div>`;
+}
+
+function renderTravelContent(content) {
+  // Clear any running countdown intervals
+  if (window._travelIntervals) {
+    window._travelIntervals.forEach(id => clearInterval(id));
+  }
+  window._travelIntervals = [];
+
+  const cardsHTML = DATA.travel.trips.map(buildTripCard).join("");
+  content.innerHTML = `<div class="trip-grid">${cardsHTML}</div>`;
+
+  // Start live countdown tickers for non-expired, non-underway trips
+  DATA.travel.trips.forEach(trip => {
+    if (!trip.data || tripExpired(trip) || tripUnderway(trip)) return;
+    const id = `cd-${trip.slot}`;
+    const tick = () => {
+      const ms = msUntil(trip.data.departureDate);
+      if (ms <= 0) { clearInterval(intervalId); return; }
+      const days = Math.floor(ms / 86400000);
+      const hrs  = Math.floor((ms % 86400000) / 3600000);
+      const mins = Math.floor((ms % 3600000) / 60000);
+      const secs = Math.floor((ms % 60000) / 1000);
+      const pad  = n => String(n).padStart(2, "0");
+      const dEl = document.getElementById(`${id}-d`);
+      const hEl = document.getElementById(`${id}-h`);
+      const mEl = document.getElementById(`${id}-m`);
+      const sEl = document.getElementById(`${id}-s`);
+      if (dEl) dEl.textContent = days;
+      if (hEl) hEl.textContent = pad(hrs);
+      if (mEl) mEl.textContent = pad(mins);
+      if (sEl) sEl.textContent = pad(secs);
+    };
+    tick(); // immediate first render
+    const intervalId = setInterval(tick, 1000);
+    window._travelIntervals.push(intervalId);
+  });
 }
 
 // ═══════════════════════════
@@ -2498,6 +2980,178 @@ function switchTab(btn) {
 }
 
 // ═══════════════════════════
+// PAGE: DEFINITIONS
+// ═══════════════════════════
+const AI_DEFINITIONS = [
+  { term: "Activation Function", def: "A mathematical function applied to a neuron's output that determines whether and how strongly it fires, enabling neural networks to model non-linear patterns." },
+  { term: "Adversarial Attack", def: "A technique where small, carefully crafted perturbations to inputs cause AI models to produce incorrect outputs, exposing robustness weaknesses." },
+  { term: "Agent", def: "An AI system that perceives its environment, makes decisions, and takes actions—often autonomously—to achieve specific goals." },
+  { term: "Alignment", def: "The goal of ensuring AI systems behave in accordance with human values, intentions, and ethical principles, especially as they become more capable." },
+  { term: "Artificial General Intelligence (AGI)", def: "A hypothetical AI system capable of performing any intellectual task a human can do, with general reasoning across all domains." },
+  { term: "Artificial Intelligence (AI)", def: "The simulation of human intelligence processes—including learning, reasoning, and problem-solving—by computer systems." },
+  { term: "Attention Mechanism", def: "A component in neural networks that enables the model to focus on the most relevant parts of an input sequence when generating output." },
+  { term: "AutoML", def: "Automated Machine Learning; the process of automating the selection, training, and tuning of machine learning models without manual intervention." },
+  { term: "Backpropagation", def: "The algorithm used to train neural networks by computing gradients of the loss with respect to each weight and propagating them backward through the network." },
+  { term: "Batch Normalization", def: "A technique that normalizes the inputs of each layer in a neural network during training to stabilize and accelerate learning." },
+  { term: "Benchmark", def: "A standardized test or dataset used to measure, compare, and evaluate the performance of AI models." },
+  { term: "BERT", def: "Bidirectional Encoder Representations from Transformers; a Google language model pre-trained on large text corpora that revolutionized NLP tasks." },
+  { term: "Bias", def: "Systematic errors in AI model outputs resulting in unfair, skewed, or discriminatory outcomes, often reflecting biases present in training data." },
+  { term: "Chain-of-Thought Prompting", def: "A prompting technique that encourages an AI model to reason step-by-step before arriving at a final answer, improving accuracy on complex tasks." },
+  { term: "Chatbot", def: "A software application designed to simulate human conversation through text or voice, often powered by rule-based or AI language models." },
+  { term: "Classification", def: "A supervised learning task where the model predicts which category or class a given input belongs to." },
+  { term: "Clustering", def: "An unsupervised learning technique that groups similar data points together based on shared characteristics, without using predefined labels." },
+  { term: "Computer Vision", def: "A field of AI enabling computers to interpret, analyze, and understand visual information from images and video." },
+  { term: "Confusion Matrix", def: "A table used to evaluate classification model performance by comparing predicted versus actual class labels across all categories." },
+  { term: "Context Window", def: "The maximum amount of text (measured in tokens) that a language model can read and process at one time." },
+  { term: "Convolutional Neural Network (CNN)", def: "A deep learning architecture particularly effective for processing grid-like data such as images, using convolutional filters to detect local patterns." },
+  { term: "Data Augmentation", def: "Techniques to artificially expand training datasets by applying transformations—such as rotation, cropping, or flipping—to existing samples." },
+  { term: "Dataset", def: "A structured collection of data—text, images, or numerical values—used to train, validate, or test a machine learning model." },
+  { term: "Decision Tree", def: "A tree-structured model that makes decisions by splitting data on feature values at each internal node and predicting at leaf nodes." },
+  { term: "Deep Learning", def: "A subset of machine learning that uses neural networks with many hidden layers to automatically learn hierarchical representations from raw data." },
+  { term: "Diffusion Model", def: "A generative AI model that learns to create data by gradually reversing a process of adding noise, producing high-quality images or other outputs." },
+  { term: "Dropout", def: "A regularization technique that randomly deactivates a fraction of neurons during each training step to prevent overfitting." },
+  { term: "Embedding", def: "A dense, low-dimensional numerical representation of high-dimensional data (such as words or images) that captures semantic relationships in vector space." },
+  { term: "Encoder", def: "The component of a neural network model that compresses and encodes input data into a compact internal representation for further processing." },
+  { term: "Ensemble Method", def: "A technique that combines predictions from multiple machine learning models to achieve better overall performance than any single model." },
+  { term: "Epoch", def: "One complete pass through the entire training dataset during the model training process." },
+  { term: "Explainability", def: "The degree to which the internal workings, decisions, and predictions of an AI model can be understood and interpreted by humans." },
+  { term: "Feature", def: "An individual measurable property or characteristic of the data used as an input variable in a machine learning model." },
+  { term: "Feature Engineering", def: "The process of using domain knowledge to create, transform, or select the most informative input variables for a machine learning model." },
+  { term: "Federated Learning", def: "A distributed training approach where model updates are computed locally on devices and aggregated centrally, without sharing raw data." },
+  { term: "Few-Shot Learning", def: "A model's ability to generalize and perform a task from a very small number of labeled training examples." },
+  { term: "Fine-Tuning", def: "The process of further training a pre-trained model on a specific, often smaller dataset to adapt it for a particular task." },
+  { term: "Foundation Model", def: "A large AI model trained on broad, diverse data at scale that can be adapted to a wide range of downstream tasks through fine-tuning or prompting." },
+  { term: "Generative Adversarial Network (GAN)", def: "A model architecture consisting of a generator and a discriminator that compete with each other to produce increasingly realistic synthetic data." },
+  { term: "Generative AI", def: "AI systems capable of creating new content—including text, images, audio, and video—by learning patterns from training data." },
+  { term: "GPT", def: "Generative Pre-trained Transformer; a family of large language models developed by OpenAI, trained to generate coherent and contextually relevant text." },
+  { term: "Gradient Descent", def: "An optimization algorithm that minimizes a model's loss function by iteratively adjusting weights in the direction of steepest descent." },
+  { term: "Grounding", def: "The process of linking AI-generated responses to verified real-world facts, documents, or data sources to improve accuracy and reduce hallucinations." },
+  { term: "Hallucination", def: "When an AI model generates plausible-sounding but factually incorrect, fabricated, or nonsensical information as if it were true." },
+  { term: "Hugging Face", def: "A leading AI platform and open-source community widely used for sharing, discovering, and deploying pre-trained models and datasets." },
+  { term: "Human-in-the-Loop", def: "An AI system design that incorporates human review, feedback, and oversight at key decision points during operation or training." },
+  { term: "Hyperparameter", def: "A configuration setting defined before training begins that controls the model's architecture or the training process, such as learning rate or number of layers." },
+  { term: "Image Segmentation", def: "A computer vision task that assigns a class label to every individual pixel in an image, enabling detailed scene understanding." },
+  { term: "In-Context Learning", def: "A model's ability to perform new tasks by learning from examples provided directly within the input prompt, without updating its weights." },
+  { term: "Inference", def: "The process of running a trained AI model on new, unseen data to generate predictions, decisions, or outputs." },
+  { term: "JSONL", def: "JSON Lines format; a text format where each line is a valid JSON object, widely used for storing large datasets for AI training pipelines." },
+  { term: "K-Nearest Neighbors (KNN)", def: "A simple, instance-based ML algorithm that classifies or predicts for a data point based on the majority label or average of its K closest training examples." },
+  { term: "Knowledge Graph", def: "A structured representation of entities and their semantic relationships, used to enrich AI systems with factual, interconnected knowledge." },
+  { term: "Language Model", def: "An AI model trained to understand and generate human language by predicting the probability of word sequences." },
+  { term: "Large Language Model (LLM)", def: "A language model trained on massive text corpora with billions of parameters, capable of sophisticated language understanding and generation." },
+  { term: "Latent Space", def: "The abstract, compressed internal representation learned by a model's layers, where similar concepts are positioned close together." },
+  { term: "Learning Rate", def: "A hyperparameter that controls how much a model's weights are adjusted in response to the computed gradient during each training step." },
+  { term: "Logistic Regression", def: "A statistical ML algorithm that models the probability of binary class outcomes using a sigmoid function applied to a linear combination of features." },
+  { term: "Long Short-Term Memory (LSTM)", def: "A type of recurrent neural network specifically designed to learn and retain information over long sequences by using gating mechanisms." },
+  { term: "Loss Function", def: "A mathematical function that measures the difference between the model's predictions and the actual target values, guiding the training process." },
+  { term: "Machine Learning (ML)", def: "A subset of AI in which systems automatically learn and improve from experience (data) without being explicitly programmed for each task." },
+  { term: "Mixture of Experts (MoE)", def: "A model architecture that routes each input to a subset of specialized sub-networks (experts), enabling efficient scaling to very large model sizes." },
+  { term: "Model", def: "A trained mathematical representation of patterns in data, used to make predictions, classifications, or decisions on new inputs." },
+  { term: "Model Compression", def: "Techniques to reduce the size and computational requirements of a trained model—such as pruning, quantization, and knowledge distillation—while preserving performance." },
+  { term: "Multimodal", def: "AI models that can process and reason across multiple types of input data simultaneously, such as text, images, audio, and video." },
+  { term: "Natural Language Processing (NLP)", def: "A field of AI focused on enabling computers to read, understand, interpret, and generate human language in a meaningful way." },
+  { term: "Neural Network", def: "A computational model loosely inspired by the human brain, consisting of interconnected layers of nodes (neurons) that learn from data." },
+  { term: "Node", def: "A single computational unit (neuron) in a neural network that receives inputs, applies a weighted sum and activation function, and passes output forward." },
+  { term: "Object Detection", def: "A computer vision task that identifies the presence, class, and location (bounding box) of objects within images or video frames." },
+  { term: "Ontology", def: "A formal, structured representation of concepts, categories, and relationships within a domain, used to organize knowledge for AI reasoning." },
+  { term: "Overfitting", def: "When a model learns training data too precisely—capturing noise as well as signal—and fails to generalize to new, unseen data." },
+  { term: "Parameter", def: "A numerical value (weight or bias) within a model that is learned and adjusted during training to minimize the loss function." },
+  { term: "Perceptron", def: "The simplest type of artificial neural network consisting of a single layer that linearly maps inputs to binary outputs." },
+  { term: "Pipeline", def: "A sequence of connected data processing or modeling steps that automate the flow from raw input through to a final prediction or output." },
+  { term: "Pre-training", def: "The initial phase of training a model on large, general-purpose datasets to establish a broad foundation before task-specific fine-tuning." },
+  { term: "Prompt", def: "The input text, instructions, or context provided to an AI model to guide and shape its response or output." },
+  { term: "Prompt Engineering", def: "The practice of designing and refining input prompts to guide AI language models toward producing accurate, useful, or specifically formatted outputs." },
+  { term: "Quantization", def: "A model compression technique that reduces numerical precision (e.g., from 32-bit to 8-bit) to decrease model size and increase inference speed." },
+  { term: "Random Forest", def: "An ensemble learning method that builds multiple decision trees on random data subsets and combines their predictions for improved accuracy and robustness." },
+  { term: "Recurrent Neural Network (RNN)", def: "A neural network architecture designed to process sequential data by maintaining a hidden state that captures information from previous time steps." },
+  { term: "Regularization", def: "Techniques applied during training to prevent overfitting by constraining model complexity, such as L1/L2 penalties or dropout." },
+  { term: "Reinforcement Learning (RL)", def: "A machine learning paradigm where an agent learns optimal behavior by interacting with an environment and receiving rewards or penalties for actions taken." },
+  { term: "Reinforcement Learning from Human Feedback (RLHF)", def: "A training technique that uses ranked human preferences to fine-tune AI models toward more helpful, harmless, and honest behavior." },
+  { term: "Retrieval-Augmented Generation (RAG)", def: "A technique that enhances LLM responses by dynamically retrieving relevant external documents or data and incorporating them into the generation context." },
+  { term: "Semantic Search", def: "A search approach that understands the meaning and intent behind a query—rather than just matching keywords—to return more relevant results." },
+  { term: "Sentiment Analysis", def: "An NLP task that automatically identifies and classifies the emotional tone or opinion expressed in text as positive, negative, or neutral." },
+  { term: "Softmax", def: "A mathematical function applied to a vector of outputs to convert them into a probability distribution that sums to one, used in classification tasks." },
+  { term: "Sparse Model", def: "A model in which the majority of parameters are zero or inactive, enabling greater computational efficiency without significant performance loss." },
+  { term: "Stochastic Gradient Descent (SGD)", def: "A variant of gradient descent that updates model weights using the gradient computed from a randomly selected single sample or small batch of data." },
+  { term: "Supervised Learning", def: "A machine learning approach where a model is trained on labeled input-output pairs, learning to map inputs to the correct outputs." },
+  { term: "System Prompt", def: "Instructions provided to an AI model before a conversation begins to configure its persona, tone, behavior, and constraints." },
+  { term: "Temperature", def: "A parameter that controls the randomness of an AI model's output: low values produce more deterministic responses; high values produce more varied and creative ones." },
+  { term: "Token", def: "The basic unit of text that a language model processes—typically a word, subword, or character—into which all input and output is split." },
+  { term: "Tokenization", def: "The process of splitting text into individual tokens (words, subwords, or characters) for processing by a language model." },
+  { term: "Transfer Learning", def: "A technique where knowledge learned by a model on one task is reused as the starting point for a different but related task, reducing training time and data requirements." },
+  { term: "Transformer", def: "A neural network architecture based on self-attention mechanisms that processes sequences in parallel, and is the foundation of most modern large language models." },
+  { term: "Underfitting", def: "When a model is too simple to capture the underlying patterns in the training data, resulting in poor performance on both training and new data." },
+  { term: "Unsupervised Learning", def: "A machine learning approach where a model identifies patterns, structure, or relationships in data without any labeled examples or explicit guidance." },
+  { term: "Validation Set", def: "A subset of data held out from training and used to evaluate model performance and tune hyperparameters during the development process." },
+  { term: "Vector Database", def: "A database optimized for storing and efficiently searching high-dimensional vector embeddings, enabling semantic similarity search at scale." },
+  { term: "Weight", def: "A trainable numerical parameter in a neural network that scales the strength of connections between neurons, adjusted during backpropagation to minimize loss." },
+  { term: "XGBoost", def: "Extreme Gradient Boosting; a highly efficient and widely used gradient boosting algorithm known for strong performance on structured/tabular data." },
+  { term: "Zero-Shot Learning", def: "A model's ability to correctly perform a task or recognize a category it was never explicitly trained on, relying on generalization from related knowledge." }
+];
+
+function renderDefinitions(container) {
+  // Group definitions by first letter
+  const grouped = {};
+  AI_DEFINITIONS.forEach(d => {
+    const letter = d.term[0].toUpperCase();
+    if (!grouped[letter]) grouped[letter] = [];
+    grouped[letter].push(d);
+  });
+
+  const presentLetters = new Set(Object.keys(grouped));
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+  // Build alphabet bar
+  const alphaBarHTML = alphabet.map(l => {
+    const active = presentLetters.has(l);
+    return `<button class="alpha-btn${active ? "" : " disabled"}" data-letter="${l}" onclick="defFilterLetter('${l}')">${l}</button>`;
+  }).join("");
+
+  // Build all definition groups
+  const allGroupsHTML = alphabet
+    .filter(l => grouped[l])
+    .map(l => `
+      <div class="def-letter-group" data-group="${l}">
+        <div class="def-letter-heading">${l}</div>
+        ${grouped[l].map(d => `
+          <div class="def-item">
+            <div class="def-term">${d.term}</div>
+            <div class="def-meaning">${d.def}</div>
+          </div>`).join("")}
+      </div>`).join("");
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">📖 Definitions</div>
+        <div class="page-subtitle">100 essential AI terms — every practitioner should know these</div>
+        <span class="count-chip">100 definitions</span>
+      </div>
+      <div class="alpha-bar" id="def-alpha-bar">
+        <button class="alpha-btn active" data-letter="ALL" onclick="defFilterLetter('ALL')" style="width:auto;padding:0 10px;font-size:11px;letter-spacing:0.3px;">ALL</button>
+        ${alphaBarHTML}
+      </div>
+      <div id="def-groups">${allGroupsHTML}</div>
+    </div>`;
+
+  window.defFilterLetter = function(letter) {
+    // Update active button
+    document.querySelectorAll("#def-alpha-bar .alpha-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.letter === letter);
+    });
+    // Show/hide groups
+    document.querySelectorAll("#def-groups .def-letter-group").forEach(g => {
+      if (letter === "ALL") {
+        g.style.display = "";
+      } else {
+        g.style.display = g.dataset.group === letter ? "" : "none";
+      }
+    });
+    // Scroll main to top
+    document.getElementById("main").scrollTo(0, 0);
+  };
+}
+
+// ═══════════════════════════
 // ROUTE MAP
 // ═══════════════════════════
 const RENDERERS = {
@@ -2510,7 +3164,8 @@ const RENDERERS = {
   "ai-apps":      renderAIApps,
   "home-family":  renderHomeFamily,
   "contacts":     renderContacts,
-  "misc":         renderMisc
+  "misc":         renderMisc,
+  "definitions":  renderDefinitions
 };
 
 // ═══════════════════════════
