@@ -640,6 +640,53 @@
   .action-text { font-size: 13.5px; color: var(--text-primary); line-height: 1.45; }
   .action-ref { font-size: 11.5px; color: var(--accent); margin-top: 3px; }
 
+  /* ── HF ACTION ITEM CHECKBOXES ── */
+  .hf-cb-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .hf-cb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .hf-cb:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .hf-cb:checked::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 5px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+  .hf-cb:hover:not(:checked) { border-color: var(--accent-hover, var(--accent)); background: rgba(0,0,0,0.04); }
+  .action-row.hf-completed {
+    opacity: 0.52;
+  }
+  .action-row.hf-completed .action-text,
+  .action-row.hf-completed .action-ref {
+    text-decoration: line-through;
+    color: var(--text-tertiary);
+  }
+
   /* ── CONTACT CARD ── */
   .contact-row {
     display: flex;
@@ -992,9 +1039,200 @@
     .trip-name { font-size: 15px; }
     .countdown-num { font-size: 22px; }
   }
+
+  /* ══════════════════════════════════
+     MOBILE TOP BAR & SIDEBAR OVERLAY
+  ══════════════════════════════════ */
+  #mobile-topbar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    background: var(--sidebar-bg);
+    z-index: 200;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+  #mobile-menu-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 1;
+    flex-shrink: 0;
+    border-radius: 7px;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #mobile-menu-btn:active { background: rgba(255,255,255,0.12); }
+  #mobile-topbar-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #c8761a, #e8a84a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.3px;
+    flex-shrink: 0;
+  }
+  #mobile-topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: -0.2px;
+  }
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.52);
+    z-index: 155;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+  #sidebar-overlay.vis { display: block; }
+
+  /* ══════════════════════════
+     RESPONSIVE — MOBILE / IPHONE
+  ══════════════════════════ */
+  @media (max-width: 768px) {
+    /* Show top bar */
+    #mobile-topbar { display: flex; }
+
+    /* Disable the desktop flex layout — let fixed positioning take over */
+    #app {
+      display: block;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* Sidebar: fixed, slides in from the left */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 280px;
+      min-width: 280px;
+      height: 100%;
+      z-index: 160;
+      transform: translateX(-100%);
+      transition: transform 0.26s cubic-bezier(0.4,0,0.2,1);
+    }
+    #sidebar.mob-open { transform: translateX(0); }
+
+    /* Main: fixed panel that fills the screen below the topbar.
+       This bypasses all iOS overflow:hidden / 100vh quirks. */
+    #main {
+      position: fixed;
+      top: 54px;
+      left: 0; right: 0; bottom: 0;
+      height: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── HOME PAGE — fill the fixed #main container ── */
+    .home-page {
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+    }
+    .home-content { padding: 32px 22px 30px; }
+    .home-name { font-size: 36px; letter-spacing: -1.5px; }
+    .home-date { font-size: 15px; }
+    .home-greeting { font-size: 11px; }
+    .home-search-wrap { margin: 22px 0 18px; }
+    .home-search-field { max-width: 100%; }
+    .home-search-results { max-width: 100%; }
+    .home-stats { gap: 10px; }
+    .stat-pill { min-width: calc(50% - 5px); padding: 12px 14px; flex: 1 1 calc(50% - 5px); }
+    .stat-num { font-size: 22px; }
+    .stat-lbl { font-size: 10.5px; }
+
+    /* ── CATEGORY PAGES ── */
+    .cat-page { padding: 22px 16px 56px; }
+    .page-title { font-size: 22px; letter-spacing: -0.5px; }
+    .page-subtitle { font-size: 13px; }
+
+    /* ── TAB BAR — horizontal scroll ── */
+    .tab-bar {
+      width: 100%;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    /* ── ENTRY CARDS ── */
+    .card-top { padding: 14px 16px 10px; gap: 10px; }
+    .card-cat-dot { width: 28px; height: 28px; font-size: 14px; border-radius: 7px; }
+    .card-title { font-size: 13.5px; }
+    .card-summary { padding: 0 16px 12px 16px; font-size: 13px; }
+    .detail-section { padding: 14px 16px; }
+    .card-chevron { width: 22px; height: 22px; font-size: 10px; }
+
+    /* ── ENTITY CARDS ── */
+    .entity-header { padding: 14px 16px; }
+    .entity-body { padding: 0 12px 16px; }
+
+    /* ── ACTION ROWS ── */
+    .action-row { padding: 11px 14px; gap: 10px; }
+    .action-text { font-size: 13px; }
+
+    /* ── GOALS ── */
+    .goal-card { padding: 16px; }
+
+    /* ── HANDBOOK LINK (AIGP page) ── */
+    a[href*="IAPP"] { flex-wrap: wrap; gap: 10px; }
+
+    /* ── ALPHABET BAR (Definitions) ── */
+    .alpha-bar {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .alpha-bar::-webkit-scrollbar { display: none; }
+    .alpha-btn { min-width: 28px; }
+
+    /* ── CONTACTS ── */
+    .contact-row { flex-wrap: wrap; }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider { font-size: 10px; margin: 18px 0 8px; }
+  }
+
+  /* Extra-small phones (SE, Mini) */
+  @media (max-width: 390px) {
+    .home-name { font-size: 30px; }
+    .stat-pill { min-width: 100%; flex: 1 1 100%; }
+    .cat-page { padding: 18px 12px 56px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- ══ MOBILE TOP BAR ══ -->
+<div id="mobile-topbar">
+  <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open menu">☰</button>
+  <div id="mobile-topbar-logo">SG</div>
+  <div id="mobile-topbar-title">Intelligence Hub</div>
+</div>
+
+<!-- ══ SIDEBAR OVERLAY ══ -->
+<div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
 <div id="app">
 
   <!-- ══ SIDEBAR ══ -->
@@ -1032,6 +1270,11 @@
         <span class="nav-icon">⚡</span>
         <span class="nav-label">Critical Action Items</span>
         <span class="nav-badge" id="badge-action-items">0</span>
+      </div>
+      <div class="nav-item" data-page="aigp-cert" onclick="navigate('aigp-cert')">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-label">AIGP Certification</span>
+        <span class="nav-badge" id="badge-aigp-cert">0</span>
       </div>
 
       <div class="nav-section">Knowledge</div>
@@ -1088,7 +1331,7 @@
 const DATA = {
   meta: {
     owner: "Sam Gordon",
-    lastUpdated: "2026-05-03",
+    lastUpdated: "2026-05-14",
     version: "1.0"
   },
 
@@ -1156,7 +1399,7 @@ const DATA = {
       title: "AI Certification Study Plan and Exam Timeline",
       date: "2026-04-29",
       dateAdded: "2026-05-02",
-      primaryCategory: "goals",
+      primaryCategory: "aigp-cert",
       secondaryCategories: [],
       summary: "A structured plan to prepare for a primary AI certification exam by September 1, 2026, with daily 1-hour study sessions, flexible exam booking strategy, and a roadmap for 4–5 additional AI-related certifications. The plan also covers maintaining law license throughout and adding certifications to marketing materials upon completion.",
       keyPoints: [
@@ -1256,7 +1499,7 @@ const DATA = {
       title: "Stanford AI Index Report",
       date: null,
       dateAdded: "2026-05-02",
-      primaryCategory: "research",
+      primaryCategory: "aigp-cert",
       secondaryCategories: [],
       summary: "A voice note flagging the Stanford AI Index Report as a key research resource to review. The Stanford AI Index is an annual publication tracking AI capabilities, investment, policy trends, and societal impact — an authoritative reference for understanding the current state and trajectory of AI.",
       keyPoints: [
@@ -1381,7 +1624,7 @@ const DATA = {
       title: "Mastering Advanced AI: Three-Step Pathway from Basic User to Elite Operator",
       date: "2026-04-30",
       dateAdded: "2026-05-02",
-      primaryCategory: "ai-apps",
+      primaryCategory: "aigp-cert",
       secondaryCategories: [],
       summary: "Most users remain stuck in basic AI applications like email drafting. A clear three-step pathway exists to elite operator status: (1) vendor-provided free training, (2) Claude's formal skills library (executable playbooks), and (3) the 'Awesome Claude Code Subagents' community repository — an app store for pre-built AI capabilities.",
       keyPoints: [
@@ -1431,7 +1674,7 @@ const DATA = {
       title: "Free AI Learning Roadmap: CS229, CS224N, and CS230 Stanford Courses",
       date: "2026-04-30",
       dateAdded: "2026-05-02",
-      primaryCategory: "ai-apps",
+      primaryCategory: "aigp-cert",
       secondaryCategories: [],
       summary: "Three free Stanford courses form the backbone of a structured AI learning roadmap: CS229 (Machine Learning fundamentals by Andrew Ng), CS224N (NLP and transformers by Christopher Manning), and CS230 (Deep Learning in the real world by Andrew Ng). Together they take a learner from foundational theory to practical, deployable ML projects.",
       keyPoints: [
@@ -1733,6 +1976,509 @@ const DATA = {
       goalRefs: [],
       homeSubCategory: "Canadian Citizenship",
       tags: ["citizenship", "Canada", "checklist", "action items", "IRCC", "application", "legal"]
+    },
+    {
+      id: "e028",
+      title: "AI Glossary Definitions Page: 100-Term Alphabetical Spec",
+      date: "2026-05-02",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: ["new-ideas"],
+      summary: "Specification for a 100-term AI glossary page with alphabetical A–Z navigation, standardized one-to-two-sentence definitions, and a formal editorial governance framework for an AI education resource.",
+      files: { summary: "05-02 AI Glossary Definitions Page_ Alphabetical, Usability-Focused Spec-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "glossary", "content", "UX", "web design", "education", "definitions"]
+    },
+    {
+      id: "e029",
+      title: "Product Vision: AI-Powered Financial Dashboard via Rocket Money Integration",
+      date: "2026-05-02",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "Product vision to pull Rocket Money financial data into a co-work system, generating an AI-powered spending and income profile visualized on a live artifact dashboard with interactive charts.",
+      files: { summary: "05-02 Defining a Product Vision for an AI-Powered Financial Dashboard-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "financial", "dashboard", "Rocket Money", "product vision", "data analysis", "co-work"]
+    },
+    {
+      id: "e030",
+      title: "Dashboard Update: Home and Family Category Itinerary",
+      date: "2026-05-02",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Meeting notes about updating the Home and Family dashboard category with new itinerary information; work pending assignment of an owner and explicit start instructions.",
+      files: { summary: "05-02 Meeting_ Dashboard Update, Home and Family Category-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["dashboard", "home", "family", "itinerary", "planning", "project management"]
+    },
+    {
+      id: "e031",
+      title: "Task: Remove Extra T-Mobile Line Added for Karen's Watch Discount",
+      date: "2026-05-03",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Task to remove an extra T-Mobile line that was temporarily required during Karen's watch purchase to qualify for a signup discount, now that the required holding period has elapsed.",
+      files: { summary: "05-03 Task Note_ Remove Extra T-Mobile Line for Watch Discount-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["T-Mobile", "phone plan", "task", "home", "Karen", "subscription"]
+    },
+    {
+      id: "e032",
+      title: "Task: Renew Tesla Vehicle Registration",
+      date: "2026-05-03",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Brief to-do note to renew vehicle registration for the Tesla.",
+      files: { summary: "2026-05-03 12_11_34-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["Tesla", "registration", "task", "vehicle", "home"]
+    },
+    {
+      id: "e033",
+      title: "Task: Run Amazon Purchase History Through AI for Analysis",
+      date: "2026-05-04",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: ["ai-apps"],
+      summary: "To-do item to feed Amazon account purchase and returns data into AI for in-depth analysis of spending patterns.",
+      files: { summary: "2026-05-04 21_46_06-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["Amazon", "AI", "purchases", "data analysis", "task", "home"]
+    },
+    {
+      id: "e034",
+      title: "Memo: NordPass Password Manager Backup Plan",
+      date: "2026-05-04",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Action item to verify NordPass cloud backup is active and configured correctly, and to create an exportable password file as a secondary safeguard against lockout or system failure.",
+      files: { summary: "05-04 Memo_ NordPass Password Manager Backup-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["NordPass", "password manager", "security", "backup", "personal", "task"]
+    },
+    {
+      id: "e035",
+      title: "GitHub Repositories, Claude Code Alternatives, and Legal Risks",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Notes on notable GitHub repositories including 'Superpowers' and OpenCode — an open-source alternative offering a terminal experience comparable to Claude Code.",
+      files: { summary: "05-05 Monologue_ GitHub Repositories, Claude Code Alternatives, and Legal Risks-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["GitHub", "Claude Code", "OpenCode", "open source", "AI tools", "alternatives", "legal"]
+    },
+    {
+      id: "e036",
+      title: "Top 5 Essential Claude MCP Servers",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Overview of five essential Claude MCP servers — Severely, Playwright, Context, Task Master AI, and Markdownify — that extend Claude from information provider to action-taker across web automation, coding, and file processing.",
+      files: { summary: "05-05 Informational Recording_ Claude NCP Servers-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["Claude", "MCP", "servers", "Playwright", "automation", "AI tools", "integration", "workflow"]
+    },
+    {
+      id: "e037",
+      title: "Integrating Claude Code with Google Notebook LM in 60 Seconds",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Quick setup guide for connecting Claude Code with Notebook LM via a cloned GitHub repo, enabling a unified single-chat workflow for research, podcast creation, slide decks, and project builds.",
+      files: { summary: "05-05 Promo_ Fast Integration of Claude Code with Notebook LM for Unified Research and Build-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["Claude Code", "Notebook LM", "Google", "integration", "research", "productivity", "workflow"]
+    },
+    {
+      id: "e038",
+      title: "Strategic AI Adoption: 'Slow Is Smooth, Smooth Is Fast'",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Strategic perspective arguing that deliberate, methodical AI adoption consistently outperforms reactive panic-driven deployment — with industry adoption rate being the more relevant benchmark than technology advancement speed.",
+      files: { summary: "05-05 Monologue_ Strategic AI Adoption — _Slow Is Smooth, Smooth Is Fast-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "strategy", "adoption", "business", "consulting", "leadership", "change management"]
+    },
+    {
+      id: "e039",
+      title: "AI Compliance Book Project",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: [],
+      summary: "Outline for a short public-education book explaining why individuals and organizations must adopt AI methodically and safely, emphasizing personal and corporate responsibility and the value of AIGP certification as a baseline credential.",
+      files: { summary: "05-05 Recording_ AI Compliance Book Project-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "compliance", "book", "AIGP", "certification", "education", "publishing", "marketing"]
+    },
+    {
+      id: "e040",
+      title: "Publicly Accessible Data Websites: OSINT and Internet Exposure",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "research",
+      secondaryCategories: [],
+      summary: "Survey of seven publicly accessible websites — Wigle, VirusTotal, Wayback Machine, Have I Been Pwned, OSINT Industries, Insecam, and Shodan — exposing vast internet-connected data, with guidance on legal and ethical use.",
+      files: { summary: "05-05 Informational Video_ Publicly Accessible Data Websites-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["OSINT", "security", "privacy", "research", "Shodan", "Wigle", "Have I Been Pwned", "internet", "data"]
+    },
+    {
+      id: "e041",
+      title: "Home: Potential Backyard Water Leak Investigation",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Karen's concern about a potential underground water leak near the former basil plant location; action item to review water bills for unusual consumption spikes.",
+      files: { summary: "2026-05-05 20_33_26-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["home", "water leak", "Karen", "utility", "task", "maintenance"]
+    },
+    {
+      id: "e042",
+      title: "Personal Health Notes: Knee, Dermatology, and Right Calf",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Personal health notes covering knee clicking on bends, dermatology concerns (skin tags under eyes, red area on nose, raised dry skin), and a right calf issue — compiled to prepare for upcoming primary care and dermatology appointments.",
+      files: { summary: "05-05 Personal Health Note_ Knee Clicking, Dermatology Concerns, Right Calf Issue-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Health",
+      tags: ["health", "medical", "dermatology", "knee", "personal", "doctor", "appointments"]
+    },
+    {
+      id: "e043",
+      title: "New Idea: AI-Powered Grocery Optimization via UPC Scanning",
+      date: "2026-05-05",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["home-family"],
+      summary: "Concept to use AI with UPC codes to identify the lowest local prices and applicable coupons for groceries within a five-mile radius, building a real-time product database via a handheld barcode scanner.",
+      files: { summary: "05-05 Monologue_ AI-Powered Grocery Optimization via UPC Scanning and Local Price Comparison-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "grocery", "shopping", "UPC", "price comparison", "optimization", "home", "barcode"]
+    },
+    {
+      id: "e044",
+      title: "AI-Assisted iCloud Photo Management and Family Album",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Plan to grant AI access to iCloud Photos for sorting, managing, and removing unnecessary content, with the goal of assembling a high-quality AI-curated family photo album.",
+      files: { summary: "05-06 Memo_ AI-Assisted iCloud Photo Management and Family Album-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Photos & Memories",
+      tags: ["iCloud", "photos", "AI", "family", "photo management", "home", "album"]
+    },
+    {
+      id: "e045",
+      title: "Business Idea: AI Employment Consulting Service",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: [],
+      summary: "Business concept combining a public information website about AI's career impact with personalized consulting to help individuals prevent or navigate AI-related job loss.",
+      files: { summary: "05-06 Personal Note_ AI Employment Consulting Business Idea-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "consulting", "business idea", "employment", "career", "job loss", "website"]
+    },
+    {
+      id: "e046",
+      title: "Critique of AI Agents: Markdown-Based Routing as a Simpler Alternative",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Argument that complex AI agent frameworks (LangChain, OpenAI agents) are misguided; proposes a simpler markdown-file-plus-scripts routing framework organized by folders, citing Anthropic's design philosophy as validation.",
+      files: { summary: "05-06 Monologue_ Critique of AI Agents and Alternative Framework-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "agents", "framework", "architecture", "markdown", "Claude", "Anthropic", "LangChain"]
+    },
+    {
+      id: "e047",
+      title: "AI Crawlers and Publisher Web Traffic: Rutgers/Wharton Study",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "research",
+      secondaryCategories: ["ai-apps"],
+      summary: "Rutgers/Wharton study finding that top publishers blocking AI crawlers via robots.txt lost 23% of total web visits and 14% of human traffic by disappearing from AI-powered search results and citation lists.",
+      files: { summary: "05-06 Presentation_ AI Crawlers and Publisher Web Traffic-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "SEO", "web traffic", "publishers", "crawlers", "robots.txt", "research", "OpenAI", "Anthropic", "Perplexity"]
+    },
+    {
+      id: "e048",
+      title: "Task: Integrate AI with Amazon Account for Shopping Optimization",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: ["ai-apps"],
+      summary: "To-do to integrate AI with Amazon account for tracking purchases, subscriptions, and refunds, and to optimize cart management and delivery scheduling by day.",
+      files: { summary: "05-06 Personal Note_ AI Integration with Amazon Account-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["Amazon", "AI", "shopping", "subscriptions", "task", "home", "delivery"]
+    },
+    {
+      id: "e049",
+      title: "Research Accredible for AIGP Digital Badge Display",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: [],
+      summary: "Task to research Accredible's digital badge platform for displaying the AIGP certification, maximizing credential visibility across LinkedIn and other professional and marketing channels.",
+      files: { summary: "05-06 Personal Note_ Accredible and AI GP Certification-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AIGP", "certification", "Accredible", "digital badge", "LinkedIn", "marketing", "credential"]
+    },
+    {
+      id: "e050",
+      title: "AIGP Certification: Free Candidate Handbook Available via IAPP",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: [],
+      summary: "Quick note that IAPP offers a free AIGP certification candidate handbook available for download.",
+      files: { summary: "2026-05-06 22_20_09-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AIGP", "IAPP", "certification", "handbook", "free", "study resource"]
+    },
+    {
+      id: "e051",
+      title: "AIGP Study: IAPP Website Resources and Strategy",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: [],
+      summary: "Note about IAPP's extensive free and paid resources for AIGP certification preparation, expected to enhance overall knowledge base and exam pass probability.",
+      files: { summary: "05-06 Note_ IAGP Certification Resources and IAPP Study Strategy-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AIGP", "IAPP", "certification", "study", "resources", "exam preparation"]
+    },
+    {
+      id: "e052",
+      title: "Elements of AI: Free Course Inspiration for AI Teaching",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: ["goals"],
+      summary: "Discovery of Elements of AI (elementsofai.com), a free University of Helsinki beginner course on AI and machine learning without heavy math, identified as inspiration and content source for an AI lesson segment.",
+      files: { summary: "05-06 Voice Note_ AI Course Inspiration-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "education", "course", "Elements of AI", "University of Helsinki", "teaching", "beginner", "free"]
+    },
+    {
+      id: "e053",
+      title: "AIGP 'Beyond the Certification' Resource Collection",
+      date: "2026-05-06",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: [],
+      summary: "Plan to curate a 'Beyond the Certification' resource collection for AIGP studies and future consulting practice; first entry is Ethos AI's practical guide to AI data lifecycle governance.",
+      files: { summary: "05-06 Personal Note_ AIGP Certification & AI Data Governance-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AIGP", "certification", "data governance", "AI lifecycle", "Ethos AI", "consulting", "resources"]
+    },
+    {
+      id: "e054",
+      title: "New Idea: AI-Generated Multi-Environment Camouflage Pattern",
+      date: "2026-05-07",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "Concept to use AI trained on images from diverse landscapes to design a novel repeatable camouflage textile pattern optimized for cross-environment invisibility.",
+      files: { summary: "05-07 Monologue_ AI-Generated Multi-Environment Camouflage Pattern Design-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "camouflage", "design", "textile", "pattern", "military", "creative", "generative AI"]
+    },
+    {
+      id: "e055",
+      title: "Business Associate Agreement (BAA) Under HIPAA Explained",
+      date: "2026-05-07",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: ["goals"],
+      summary: "Explanation of Business Associate Agreements — HIPAA-mandated contracts between covered entities and business associates (including AI vendors) governing the handling and protection of Protected Health Information.",
+      files: { summary: "05-07 Monologue_ Business Associate Agreement (BAA)-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["BAA", "HIPAA", "compliance", "healthcare", "AI", "legal", "PHI", "LegalTech"]
+    },
+    {
+      id: "e056",
+      title: "HIPAA Compliance: PHI, Covered Entities, and Business Associates",
+      date: "2026-05-07",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: ["goals"],
+      summary: "Comprehensive overview of HIPAA — covering protected health information, covered entity categories, business associate obligations, BAA requirements, and direct applicability to AI vendors and tools.",
+      files: { summary: "05-07 Lecture_ HIPAA Compliance, PHI, Covered Entities, and Business Associates-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["HIPAA", "compliance", "PHI", "healthcare", "AI", "legal", "BAA", "covered entities", "research"]
+    },
+    {
+      id: "e057",
+      title: "Task: Upgrade Primary AI Systems to Enterprise for Privacy",
+      date: "2026-05-07",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "To-do item to upgrade primary AI subscriptions to enterprise tier to ensure the highest privacy and data protection levels at all times.",
+      files: { summary: "2026-05-07 07_55_56-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "privacy", "enterprise", "upgrade", "task", "Claude", "security"]
+    },
+    {
+      id: "e058",
+      title: "Entry-Level AI Data Labeling and RLHF Career Path",
+      date: "2026-05-07",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: [],
+      summary: "Overview of entry-level AI data labeling and RLHF opportunities via DataAnnotation.tech, Scale AI, and Outlier — remote work paying $20–$60/hour with no prior experience required beyond basic assessments.",
+      files: { summary: "05-07 Meeting_ Entry-Level AI Data Labeling and RLHF Career Path for Students and Graduates-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "data labeling", "RLHF", "career", "entry-level", "DataAnnotation", "Scale AI", "Outlier", "remote work"]
+    },
+    {
+      id: "e059",
+      title: "Business Idea: AI Expert Witness and Legal Consulting",
+      date: "2026-05-09",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: [],
+      summary: "New business concept to serve attorneys needing AI governance expert witnesses for court cases, and to assist with examination and cross-examination of witnesses working in the AI field.",
+      files: { summary: "2026-05-09 23_46_12-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "legal", "consulting", "expert witness", "business idea", "attorneys", "governance", "court"]
+    },
+    {
+      id: "e060",
+      title: "AI Privacy Fact Sheet for General Users",
+      date: "2026-05-09",
+      dateAdded: "2026-05-14",
+      primaryCategory: "new-ideas",
+      secondaryCategories: ["ai-apps"],
+      summary: "Proposal to create a concise two-page AI privacy fact sheet with immediately actionable settings for popular AI tools (Claude, Gemini), voice-activated home assistants, and iPhone-specific privacy configurations.",
+      files: { summary: "05-09 Monologue_ AI Privacy Fact Sheet for General Users-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "privacy", "fact sheet", "consumer education", "Claude", "Gemini", "Siri", "iPhone", "voice assistants"]
+    },
+    {
+      id: "e061",
+      title: "Turnitin AI Humanizer Detection and StealthGPT Bypass Demo",
+      date: "2026-05-10",
+      dateAdded: "2026-05-14",
+      primaryCategory: "research",
+      secondaryCategories: [],
+      summary: "Report on Turnitin's upgraded AI detection now capable of identifying AI humanizer tools, with StealthGPT's humanizer demonstrated as a claimed bypass method.",
+      files: { summary: "05-10 Monologue_ Turnitin AI Humanizer Detection and StealthGPT Bypass Demo-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "Turnitin", "detection", "StealthGPT", "academic integrity", "education", "AI humanizer", "ChatGPT"]
+    },
+    {
+      id: "e062",
+      title: "Task: Tesla Lease End Review — Normal Wear and Tear",
+      date: "2026-05-10",
+      dateAdded: "2026-05-14",
+      primaryCategory: "home-family",
+      secondaryCategories: [],
+      summary: "Task to input Tesla lease into AI for a detailed review of surrender procedures and the contractual definition of normal wear and tear, to protect against unfair end-of-term charges.",
+      files: { summary: "05-10 Personal Note_ Tesla Lease End Review and Normal Wear and Tear-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      homeSubCategory: "Action Items",
+      tags: ["Tesla", "lease", "task", "AI", "legal", "home", "wear and tear", "vehicle"]
+    },
+    {
+      id: "e063",
+      title: "AI Agent Governance Risks and Controls: Hannah Fry Documentary",
+      date: "2026-05-14",
+      dateAdded: "2026-05-14",
+      primaryCategory: "aigp-cert",
+      secondaryCategories: ["goals"],
+      summary: "YouTube documentary illustrating real-world AI agent governance failures — unintended behaviors, lack of circuit breakers, and insufficient monitoring — bookmarked as a practical client case study on why governance must precede model building.",
+      files: { summary: "05-14 Briefing_ AI Agent Governance Risks and Controls-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: ["g001"],
+      tags: ["AI", "governance", "agents", "AIGP", "compliance", "risks", "monitoring", "YouTube", "circuit breaker"]
+    },
+    {
+      id: "e064",
+      title: "Audio Watermarking, Data Poisoning, and AI Music Model Reliability",
+      date: "2026-05-14",
+      dateAdded: "2026-05-14",
+      primaryCategory: "research",
+      secondaryCategories: [],
+      summary: "Technical briefing on audio watermarking via psychoacoustic masking as a data poisoning strategy for musicians, corrupting AI music model training data and reducing model reliability to force investment in data validation.",
+      files: { summary: "05-14 Briefing_ Audio Watermarking, Data Poisoning, and AI Music Model Reliability-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "watermarking", "data poisoning", "music", "copyright", "creator rights", "training data", "psychoacoustic"]
+    },
+    {
+      id: "e065",
+      title: "One-Person AI Business Playbook with Claude Agents",
+      date: "2026-05-14",
+      dateAdded: "2026-05-14",
+      primaryCategory: "ai-apps",
+      secondaryCategories: ["new-ideas"],
+      summary: "End-to-end playbook for running a solo AI business using Claude Code, Design, Dispatch, and Co-work to compress ideation, MVP development, marketing, and B2B sales from weeks into hours via parallelized sub-agent workflows.",
+      files: { summary: "05-14 Playbook_ One-Person AI Business Workflow with Claude Agents for Rapid MVP, Marketing, and Sales-Summary.txt", transcript: null, recording: null },
+      contacts: [],
+      goalRefs: [],
+      tags: ["AI", "Claude Code", "business", "MVP", "marketing", "agents", "workflow", "productivity", "one-person business", "sub-agents"]
     }
   ],
 
@@ -1745,6 +2491,13 @@ const DATA = {
       status: "To Review",
       description: "Annual Stanford report tracking AI capabilities, investment, policy trends, and societal impact. Flagged as a key resource for AI certification preparation and consulting work.",
       entryRef: "e007"
+    },
+    {
+      id: "rp002",
+      name: "HIPAA Compliance for AI",
+      status: "In Progress",
+      description: "Study of HIPAA's scope, PHI definitions, covered entities, and business associate obligations as they apply to AI vendors and tools. Relevant to AIGP certification and future healthcare consulting work.",
+      entryRef: "e056"
     }
   ],
 
@@ -1752,14 +2505,18 @@ const DATA = {
     {
       id: "g001",
       title: "Achieve AI Professional Certification by September 1, 2026",
-      description: "Complete primary AI certification exam by September 2026 with a daily 1-hour study routine. Follow with 4–5 additional AI certifications. Maintain law license throughout.",
+      description: "Complete primary AI certification exam (AIGP) by September 2026 with a daily 1-hour study routine. Follow with 4–5 additional AI certifications. Maintain law license throughout.",
       deadline: "2026-09-01",
       actionItems: [
         { id: "ai001", text: "Establish a daily 1-hour study session targeting 10 PM nightly; add extra study blocks earlier in the day when available" },
         { id: "ai002", text: "Research all available AI certification exam dates and book the exam as soon as readiness is confirmed" },
         { id: "ai003", text: "Complete CS229 (Machine Learning), CS224N (NLP with Deep Learning), and CS230 (Deep Learning) as study foundation" },
         { id: "ai004", text: "Identify 4–5 smaller AI-related certifications and set internal completion deadlines for each" },
-        { id: "ai005", text: "Add certification to LinkedIn, marketing materials, and resume immediately upon completion" }
+        { id: "ai005", text: "Add certification to LinkedIn, marketing materials, and resume immediately upon completion" },
+        { id: "ai010", text: "Download and review the free AIGP candidate handbook available from IAPP (iapp.org)" },
+        { id: "ai011", text: "Explore IAPP website for additional free and paid study resources to supplement AIGP exam preparation" },
+        { id: "ai012", text: "Research Accredible to understand all available methods for displaying the AIGP digital badge on LinkedIn and other marketing materials post-certification" },
+        { id: "ai013", text: "Build a 'Beyond the Certification' resource collection starting with Ethos AI's AI Data Lifecycle Governance guide at ethos-ai.org" }
       ]
     },
   ],
@@ -1979,9 +2736,13 @@ function fmtToday() {
 }
 
 function getEntriesFor(cat) {
-  return DATA.entries.filter(e =>
-    e.primaryCategory === cat || (e.secondaryCategories || []).includes(cat)
-  );
+  return DATA.entries
+    .filter(e => e.primaryCategory === cat || (e.secondaryCategories || []).includes(cat))
+    .sort((a, b) => {
+      const da = a.dateAdded || a.date || "";
+      const db = b.dateAdded || b.date || "";
+      return db.localeCompare(da);
+    });
 }
 
 function getAllActionItems() {
@@ -2005,6 +2766,29 @@ function navigate(page) {
   const main = document.getElementById("main");
   main.scrollTo(0, 0);
   RENDERERS[page] ? RENDERERS[page](main) : renderEmpty(main, page);
+  // Auto-close sidebar on mobile after navigation
+  closeMobileSidebar();
+}
+
+// ═══════════════════════════
+// MOBILE SIDEBAR TOGGLE
+// ═══════════════════════════
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  const isOpen = sidebar.classList.contains("mob-open");
+  if (isOpen) {
+    closeMobileSidebar();
+  } else {
+    sidebar.classList.add("mob-open");
+    overlay.classList.add("vis");
+    document.body.style.overflow = "hidden";
+  }
+}
+function closeMobileSidebar() {
+  document.getElementById("sidebar").classList.remove("mob-open");
+  document.getElementById("sidebar-overlay").classList.remove("vis");
+  document.body.style.overflow = "";
 }
 
 // ═══════════════════════════
@@ -2066,6 +2850,9 @@ function renderHome(container) {
             <div class="stat-lbl">Action Items</div>
           </div>
         </div>
+        <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,0.55);letter-spacing:0.3px;">
+          🕐 Recordings last updated: <strong style="color:rgba(255,255,255,0.8);">${fmtDate(DATA.meta.lastUpdated)}</strong>
+        </div>
       </div>
     </div>
   `;
@@ -2089,6 +2876,7 @@ const CAT_LABELS = {
   "active-biz":  "Active Business",
   "home-family": "Home & Family",
   "goals":       "Goals",
+  "aigp-cert":   "AIGP Certification",
   "contacts":    "Contacts",
   "misc":        "Misc"
 };
@@ -2484,24 +3272,50 @@ function renderHomeFamily(container) {
       const total = entryItemCount + extraCount;
       if (countEl) countEl.textContent = `${total} ${total === 1 ? "item" : "items"}`;
 
+      // localStorage helpers — keyed by stable ID so state survives tab switches & reloads
+      function hfCbKey(id) { return "hfai_" + id; }
+      function hfIsChecked(id) { try { return localStorage.getItem(hfCbKey(id)) === "1"; } catch(e) { return false; } }
+      function hfSetChecked(id, val) { try { localStorage.setItem(hfCbKey(id), val ? "1" : "0"); } catch(e) {} }
+
+      function makeCheckbox(cbId, labelText, refText) {
+        const checked = hfIsChecked(cbId);
+        return `
+          <div class="action-row${checked ? " hf-completed" : ""}" id="row-${cbId}">
+            <div class="hf-cb-wrap">
+              <input type="checkbox" class="hf-cb" id="cb-${cbId}"${checked ? " checked" : ""}
+                onchange="
+                  hfSetChecked('${cbId}', this.checked);
+                  var row = document.getElementById('row-${cbId}');
+                  if (row) row.classList.toggle('hf-completed', this.checked);
+                ">
+            </div>
+            <div class="action-body">
+              <div class="action-text">${labelText}</div>
+              ${refText ? `<div class="action-ref">${refText}</div>` : ""}
+            </div>
+          </div>`;
+      }
+
+      // expose helper to inline onchange
+      window.hfSetChecked = hfSetChecked;
+
       let html = filtered.map(e => {
-        const itemsHTML = (e.keyPoints || []).map(kp => `
-          <div class="action-row">
-            <div class="action-circle" onclick="this.classList.toggle('done')"></div>
-            <div class="action-body"><div class="action-text">${kp}</div></div>
-          </div>`).join("");
+        const kps = e.keyPoints || [];
+        if (kps.length === 0) {
+          // No sub-points — the entry title IS the action item; give it one checkbox
+          return makeCheckbox(`${e.id}_title`, e.title, e.summary ? `<span style="font-size:12px;color:var(--text-tertiary);font-style:italic">${e.summary}</span>` : "");
+        }
+        // Has sub-points — show title as section header, sub-points as individual checkboxes
+        const itemsHTML = kps.map((kp, i) =>
+          makeCheckbox(`${e.id}_${i}`, kp, "")
+        ).join("");
         return `<div class="section-divider">${e.title}</div>${itemsHTML}`;
       }).join("");
 
       if (window.hfActionExtras && window.hfActionExtras.length) {
-        const promotedHTML = window.hfActionExtras.map(item => `
-          <div class="action-row">
-            <div class="action-circle" onclick="this.classList.toggle('done')"></div>
-            <div class="action-body">
-              <div class="action-text">${item.text}</div>
-              <div class="action-ref">→ Research: ${item.entryTitle}</div>
-            </div>
-          </div>`).join("");
+        const promotedHTML = window.hfActionExtras.map(item =>
+          makeCheckbox(`promoted_${item.key}`, item.text, `→ Research: ${item.entryTitle}`)
+        ).join("");
         html += `<div class="section-divider">Pulled from Research</div>${promotedHTML}`;
       }
 
@@ -3023,6 +3837,7 @@ const AI_DEFINITIONS = [
   { term: "Foundation Model", def: "A large AI model trained on broad, diverse data at scale that can be adapted to a wide range of downstream tasks through fine-tuning or prompting." },
   { term: "Generative Adversarial Network (GAN)", def: "A model architecture consisting of a generator and a discriminator that compete with each other to produce increasingly realistic synthetic data." },
   { term: "Generative AI", def: "AI systems capable of creating new content—including text, images, audio, and video—by learning patterns from training data." },
+  { term: "GDPR", def: "General Data Protection Regulation; a comprehensive EU data privacy law (2018) that governs how organizations collect, store, and process personal data of EU residents. Directly relevant to AI governance — it restricts fully automated decision-making and profiling that produces legal or similarly significant effects on individuals." },
   { term: "GPT", def: "Generative Pre-trained Transformer; a family of large language models developed by OpenAI, trained to generate coherent and contextually relevant text." },
   { term: "Gradient Descent", def: "An optimization algorithm that minimizes a model's loss function by iteratively adjusting weights in the direction of steepest descent." },
   { term: "Grounding", def: "The process of linking AI-generated responses to verified real-world facts, documents, or data sources to improve accuracy and reduce hallucinations." },
@@ -3072,6 +3887,7 @@ const AI_DEFINITIONS = [
   { term: "Softmax", def: "A mathematical function applied to a vector of outputs to convert them into a probability distribution that sums to one, used in classification tasks." },
   { term: "Sparse Model", def: "A model in which the majority of parameters are zero or inactive, enabling greater computational efficiency without significant performance loss." },
   { term: "Stochastic Gradient Descent (SGD)", def: "A variant of gradient descent that updates model weights using the gradient computed from a randomly selected single sample or small batch of data." },
+  { term: "Street Level", def: "Borrowed from public administration theory, 'street-level bureaucracy' describes how frontline workers — or, increasingly, AI systems — exercise discretionary judgment when applying high-level policy in real-world interactions. In AI governance, street-level AI refers to systems that make consequential decisions directly affecting individuals (e.g., loan approvals, content moderation), where the gap between intended policy and actual outcome is greatest." },
   { term: "Supervised Learning", def: "A machine learning approach where a model is trained on labeled input-output pairs, learning to map inputs to the correct outputs." },
   { term: "System Prompt", def: "Instructions provided to an AI model before a conversation begins to configure its persona, tone, behavior, and constraints." },
   { term: "Temperature", def: "A parameter that controls the randomness of an AI model's output: low values produce more deterministic responses; high values produce more varied and creative ones." },
@@ -3152,6 +3968,60 @@ function renderDefinitions(container) {
 }
 
 // ═══════════════════════════
+// PAGE: AIGP CERTIFICATION
+// ═══════════════════════════
+function renderAIGP(container) {
+  const entries = getEntriesFor("aigp-cert");
+  const studyEntries = entries.filter(e => !e.tags || !e.tags.includes("governance"));
+  const govEntries = entries.filter(e => e.tags && e.tags.includes("governance"));
+
+  // Group by topic
+  const studyPlan   = entries.filter(e => e.tags && (e.tags.includes("study plan") || e.tags.includes("exam") || e.tags.includes("exam preparation")));
+  const resources   = entries.filter(e => e.tags && (e.tags.includes("resources") || e.tags.includes("study resource") || e.tags.includes("handbook") || e.tags.includes("IAPP")));
+  const compliance  = entries.filter(e => e.tags && (e.tags.includes("HIPAA") || e.tags.includes("compliance") || e.tags.includes("BAA") || e.tags.includes("data governance")));
+  const learning    = entries.filter(e => e.tags && (e.tags.includes("course") || e.tags.includes("Stanford") || e.tags.includes("education") || e.tags.includes("research")));
+  const projectsEnt = entries.filter(e => e.tags && (e.tags.includes("book") || e.tags.includes("publishing") || e.tags.includes("consulting") || e.tags.includes("Accredible")));
+  const govEnt      = entries.filter(e => e.tags && (e.tags.includes("governance") || e.tags.includes("circuit breaker") || e.tags.includes("monitoring")));
+  const remaining   = entries.filter(e => {
+    const all = [...studyPlan, ...resources, ...compliance, ...learning, ...projectsEnt, ...govEnt];
+    return !all.some(a => a.id === e.id);
+  });
+
+  function section(title, icon, items) {
+    if (!items.length) return "";
+    return `
+      <div style="margin:24px 0 10px;font-size:11.5px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.7px;">${icon} ${title}</div>
+      ${items.map(buildEntryCard).join("")}`;
+  }
+
+  container.innerHTML = `
+    <div class="cat-page">
+      <div class="page-header">
+        <div class="page-title">🎓 AIGP Certification</div>
+        <div class="page-subtitle">AI Governance Professional certification — study materials, compliance knowledge, and resources</div>
+        <span class="count-chip">${entries.length} ${entries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      <a href="IAPP-Certification_Handbook_Updated_OrgLinks_18Dec2025.pdf" target="_blank" style="display:flex;align-items:center;gap:12px;padding:13px 16px;margin-bottom:18px;background:linear-gradient(135deg,#eef4ff,#e6eeff);border:1px solid #c3d4f7;border-radius:10px;text-decoration:none;color:inherit;box-shadow:0 1px 4px rgba(60,80,180,0.07);transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 3px 10px rgba(60,80,180,0.15)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(60,80,180,0.07)'">
+        <span style="font-size:26px;flex-shrink:0;">📄</span>
+        <div>
+          <div style="font-weight:600;font-size:14px;color:#2c4aaa;">IAPP AIGP Candidate Handbook</div>
+          <div style="font-size:12px;color:#5a6ea0;margin-top:2px;">Official certification handbook — updated Dec 2025 · Click to open</div>
+        </div>
+        <span style="margin-left:auto;font-size:18px;color:#4a6fd4;">↗</span>
+      </a>
+      ${buildSearch("aigp-cert")}
+      ${section("Study Plan & Exam Strategy", "📋", studyPlan)}
+      ${section("Study Resources", "📚", resources)}
+      ${section("Compliance & HIPAA", "⚖️", compliance)}
+      ${section("Learning & Courses", "🎓", learning)}
+      ${section("Projects & Applications", "🚀", projectsEnt)}
+      ${section("AI Governance", "🛡️", govEnt)}
+      ${section("Other", "📌", remaining)}
+      ${entries.length === 0 ? emptyState("🎓", "No AIGP entries yet", "Recordings related to your AIGP certification journey will appear here.") : ""}
+    </div>`;
+}
+
+// ═══════════════════════════
 // ROUTE MAP
 // ═══════════════════════════
 const RENDERERS = {
@@ -3160,6 +4030,7 @@ const RENDERERS = {
   "new-ideas":    renderNewIdeas,
   "goals":        renderGoals,
   "action-items": renderActionItems,
+  "aigp-cert":    renderAIGP,
   "research":     renderResearch,
   "ai-apps":      renderAIApps,
   "home-family":  renderHomeFamily,
@@ -3177,6 +4048,7 @@ function updateBadges() {
     "new-ideas":    getEntriesFor("new-ideas").length,
     "goals":        DATA.goals.length,
     "action-items": getAllActionItems().length,
+    "aigp-cert":    getEntriesFor("aigp-cert").length,
     "research":     DATA.researchProjects.length + getEntriesFor("research").length,
     "ai-apps":      getEntriesFor("ai-apps").length,
     "home-family":  getEntriesFor("home-family").length,
